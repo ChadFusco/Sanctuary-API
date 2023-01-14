@@ -1,0 +1,19 @@
+{
+  "name": "sanctuary-api",
+  "version": "1.0.0",
+  "description": "API for the Sanctuary Mobile App",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --forceExit"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SanctuarySystems/Sanctuary-API.git"
+  },
+  "author": "Sanctuary Systems",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SanctuarySystems/Sanctuary-API/issues"
+  },
+  "homepage": "https://github.com/SanctuarySystems/Sanctuary-API#readme"
+}
