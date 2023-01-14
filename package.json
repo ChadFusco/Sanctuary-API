@@ -4,6 +4,7 @@
   "description": "API for the Sanctuary Mobile App",
   "main": "index.js",
   "scripts": {
+    "start": "nodemon server/index.js",
     "test": "jest --forceExit"
   },
   "repository": {
@@ -15,5 +16,16 @@
   "bugs": {
     "url": "https://github.com/SanctuarySystems/Sanctuary-API/issues"
   },
-  "homepage": "https://github.com/SanctuarySystems/Sanctuary-API#readme"
+  "homepage": "https://github.com/SanctuarySystems/Sanctuary-API#readme",
+  "dependencies": {
+    "compression": "^1.7.4",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "mongoose": "^6.8.3",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
 }
