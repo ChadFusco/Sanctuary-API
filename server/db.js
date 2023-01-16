@@ -2,13 +2,50 @@ const mongoose = require('mongoose');
 
 mongoose.set('strictQuery', true);
 
-mongoose.connect('mongodb://localhost:27017/answers');
+mongoose.connect('mongodb://localhost:27017/sanctuary');
 
-// const answerSchema = new mongoose.Schema({
-//   answerID: { type: Number, required: true, unique: true},
-// })
+const usersSchema = new mongoose.Schema({
+  username: { type: String, required: true, unique: true },
+  avatar: { type: String, required: true },
+  banned: [String],
+  spaces_joined: [String],
+  spaces_created: [String],
+  reported: [
+    {
+      space_name: { type: String },
+      qty: Number,
+    },
+  ],
+  reports: [
+    {
+      space_name: { type: String },
+      qty: Number,
+    },
+  ],
+});
 
-// const Answers = mongoose.model('Answers', answerSchema);
+const Users = mongoose.model('Users', usersSchema);
+
+const spacesSchema = new mongoose.Schema(
+  {
+    space_name: { type: String, required: true, unique: true },
+    created_by: { type: String, required: true },
+    user_count: Number,
+    description: String,
+    guidelines: [String],
+    members: [String],
+  },
+  { timestamps: true },
+);
+
+const Spaces = mongoose.model('Users', spacesSchema);
+
+const confessionsSchema = new mongoose.Schema(
+  {
+    confession_id
+  },
+  { timestamps: true },
+)
 
 // let startingAnswers = [
 //   { answerID: 1 },
