@@ -91,7 +91,7 @@ app.post('/comments', (req, res) => {
 
 // ENDPT #1
 app.get('/users/:username', (req, res) => {
-  users.readOne(req.params, (err, user) => {
+  users.readOne(req.params.username, (err, user) => {
     if (err) {
       res.status(400).send(err);
     } else {
@@ -115,12 +115,34 @@ app.get('/spaces/:space_name', (req, res) => {
 // PATCH ROUTES ----------------------------
 // ----------------------------------------
 
+// ENDPT #9
+app.patch('/confessions/:confession_id/:comment_id/pop', (req, res) => {
+  confessions.popPlopComment(req.params.confession_id, req.params.comment_id, 1, (err) => {
+    if (err) {
+      res.status(400).send(err);
+    } else {
+      res.status(204).send('NO CONTENT');
+    }
+  });
+});
+
+// ENDPT #10
+app.patch('/confessions/:confession_id/:comment_id/plop', (req, res) => {
+  confessions.popPlopComment(req.params.confession_id, req.params.comment_id, -1, (err) => {
+    if (err) {
+      res.status(400).send(err);
+    } else {
+      res.status(204).send('NO CONTENT');
+    }
+  });
+});
+
 // ENDPT #11
 app.patch('/spaces/:space_name/:username/add', (req, res) => {
   users.addSpacesJoined(req.params.space_name, req.params.username, (err) => {
     if (err) {
       res.status(400).send(err);
-    } else { // UPDATE CODE BELOW
+    } else {
       res.status(204).send('NO CONTENT');
     }
   });
@@ -131,7 +153,7 @@ app.patch('/spaces/:space_name/:username/remove', (req, res) => {
   users.removeSpacesJoined(req.params.space_name, req.params.username, (err) => {
     if (err) {
       res.status(400).send(err);
-    } else { // UPDATE CODE BELOW
+    } else {
       res.status(204).send('NO CONTENT');
     }
   });

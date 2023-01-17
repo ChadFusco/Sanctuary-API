@@ -10,7 +10,7 @@ users.create = (body, callback) => {
   }, callback);
 };
 
-users.readOne = ({ username }, callback) => {
+users.readOne = (username, callback) => {
   Users.findOne({ username }, callback);
 };
 
