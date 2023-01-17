@@ -1,30 +1,68 @@
 const mongoose = require('mongoose');
+// eslint-disable-next-line import/no-extraneous-dependencies
+const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 mongoose.set('strictQuery', true);
 
-mongoose.connect('mongodb://localhost:27017/answers');
+mongoose.connect('mongodb://localhost:27017/sanctuary');
 
-// const answerSchema = new mongoose.Schema({
-//   answerID: { type: Number, required: true, unique: true},
-// })
+const usersSchema = new mongoose.Schema({
+  username: { type: String, required: true, unique: true },
+  avatar: { type: String, required: true },
+  banned: [String],
+  spaces_joined: [String],
+  spaces_created: [String],
+  reported: [
+    {
+      space_name: String,
+      qty: Number,
+    },
+  ],
+  reports: [
+    {
+      space_name: String,
+      qty: Number,
+    },
+  ],
+});
 
-// const Answers = mongoose.model('Answers', answerSchema);
+exports.Users = mongoose.model('Users', usersSchema);
 
-// let startingAnswers = [
-//   { answerID: 1 },
-//   { answerID: 2 },
-// ];
+const spacesSchema = new mongoose.Schema(
+  {
+    space_name: { type: String, required: true, unique: true },
+    created_by: { type: String, required: true },
+    description: { type: String, default: 'default description' },
+    guidelines: [String],
+    members: [String],
+  },
+  { timestamps: true },
+);
 
-// Answers.countDocuments({}, (err, count) => {
-//   if (!count) {
-//     Answers.insertMany(startingAnswers, function(err) {
-//       if (err) {
-//         console.log('err:', err);
-//       } else {
-//         console.log('startingAnswers successfully saved!')
-//       }
-//     })
-//   }
-// })
+exports.Spaces = mongoose.model('Spaces', spacesSchema);
 
-// module.exports = Answers;
+const commentsSchema = new mongoose.Schema(
+  {
+    created_by: { type: String, required: true },
+    comment: { type: String, required: true },
+    reported: [String],
+    pops: { type: Number, default: 0, min: 0 },
+  },
+  { timestamps: true },
+);
+commentsSchema.plugin(AutoIncrement, { inc_field: 'comment_id' });
+
+const confessionsSchema = new mongoose.Schema(
+  {
+    created_by: { type: String, required: true },
+    confession: { type: String, required: true },
+    reported: [String],
+    space_name: { type: String, required: true, index: true },
+    hugs: { type: Number, default: 0, min: 0 },
+    comments: [commentsSchema],
+  },
+  { timestamps: true },
+);
+confessionsSchema.plugin(AutoIncrement, { inc_field: 'confession_id' });
+
+exports.Confessions = mongoose.model('Confessions', confessionsSchema);
