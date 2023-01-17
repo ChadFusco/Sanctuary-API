@@ -20,12 +20,11 @@ confessions.findConfession = (spaceName, username, callback, page = 1, count = 4
   }, callback);
 };
 
-confessions.findComment = async (confessionID, commentID) => {
-  const foundConfession = await confessions.readConfession(confessionID);
-  return foundConfession.comments.reduce((acc, val) => (
+confessions.findComment = async (confession, commentID) => (
+  confession.comments.reduce((acc, val) => (
     val.comment_id === commentID ? val : acc
-  ));
-};
+  ))
+);
 
 confessions.create = (body, callback) => {
   Confessions.create({
@@ -109,5 +108,15 @@ confessions.reportConfession = async (confessionID, username, callback) => {
     .then(() => callback())
     .catch((err) => callback(err));
 };
+
+confessions.reportComment = async (confessionID, commentID) => {
+  let reportedConfession;
+  let reportedComment;
+  await confessions.readConfession(confessionID)
+    .then((confession) => {
+      reportedConfession = confession;
+      return confessions.findComment(confession, commentID);
+    })
+}
 
 module.exports = confessions;
