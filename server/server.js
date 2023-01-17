@@ -32,6 +32,49 @@ app.get('/', (req, res) => {
 });
 
 // ----------------------------------------
+// GET ROUTES ----------------------------
+// ----------------------------------------
+
+// ENDPT #1
+app.get('/users/:username', (req, res) => {
+  users.readOne(req.params.username, (err, user) => {
+    if (err) {
+      res.status(400).send(err);
+    } else {
+      res.status(200).send(user);
+    }
+  });
+});
+
+// ENDPT #2
+app.get('/spaces/:space_name', (req, res) => {
+  spaces.readOne(req.params, (err, space) => {
+    if (err) {
+      res.status(400).send(err);
+    } else {
+      res.status(200).send(space);
+    }
+  });
+});
+
+// ENDPT #3
+app.get('/confessions', (req, res) => {
+  confessions.findConfession(
+    req.query.space_name,
+    req.query.username,
+    (err, foundConfessions) => {
+      if (err) {
+        res.status(400).send(err);
+      } else {
+        res.status(200).send(foundConfessions);
+      }
+    },
+    req.query.page,
+    req.query.count,
+  );
+});
+
+// ----------------------------------------
 // POST ROUTES ----------------------------
 // ----------------------------------------
 
@@ -86,34 +129,19 @@ app.post('/comments', (req, res) => {
 });
 
 // ----------------------------------------
-// GET ROUTES ----------------------------
-// ----------------------------------------
-
-// ENDPT #1
-app.get('/users/:username', (req, res) => {
-  users.readOne(req.params.username, (err, user) => {
-    if (err) {
-      res.status(400).send(err);
-    } else {
-      res.status(200).send(user);
-    }
-  });
-});
-
-// ENDPT #2
-app.get('/spaces/:space_name', (req, res) => {
-  spaces.readOne(req.params, (err, space) => {
-    if (err) {
-      res.status(400).send(err);
-    } else {
-      res.status(200).send(space);
-    }
-  });
-});
-
-// ----------------------------------------
 // PATCH ROUTES ----------------------------
 // ----------------------------------------
+
+// ENDPT #7
+app.patch('/confessions/:confession_id/report/:username', (req, res) => {
+  confessions.reportConfession(req.params.confession_id, req.params.username, (err) => {
+    if (err) {
+      res.status(400).send(err);
+    } else {
+      res.status(204).send('NO CONTENT');
+    }
+  });
+});
 
 // ENDPT #9
 app.patch('/confessions/:confession_id/:comment_id/pop', (req, res) => {

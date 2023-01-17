@@ -24,7 +24,9 @@ spaces.readOne = ({ room_name }, callback) => {
 
 spaces.addMember = async (spaceName, username, callback) => {
   const foundSpace = await Spaces.findOne({ space_name: spaceName });
-  foundSpace.members.push(username);
+  if (!foundSpace.members.some((item) => item === username)) {
+    foundSpace.members.push(username);
+  }
   await foundSpace.save()
     .then(() => callback())
     .catch((err) => callback(err));

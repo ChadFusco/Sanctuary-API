@@ -14,13 +14,13 @@ const usersSchema = new mongoose.Schema({
   spaces_created: [String],
   reported: [
     {
-      space_name: { type: String },
+      space_name: String,
       qty: Number,
     },
   ],
   reports: [
     {
-      space_name: { type: String },
+      space_name: String,
       qty: Number,
     },
   ],
@@ -57,7 +57,7 @@ const confessionsSchema = new mongoose.Schema(
     created_by: { type: String, required: true },
     confession: { type: String, required: true },
     reported: [String],
-    space_name: { type: [String], required: true, index: true },
+    space_name: { type: String, required: true, index: true },
     hugs: { type: Number, default: 0, min: 0 },
     comments: [commentsSchema],
   },

@@ -10,7 +10,11 @@ users.create = (body, callback) => {
   }, callback);
 };
 
+// eslint-disable-next-line consistent-return
 users.readOne = (username, callback) => {
+  if (!callback) {
+    return Users.findOne({ username });
+  }
   Users.findOne({ username }, callback);
 };
 
