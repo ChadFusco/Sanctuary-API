@@ -47,8 +47,8 @@ app.get('/users/:username', (req, res) => {
 });
 
 // ENDPT #2
-app.get('/spaces/:space_name', (req, res) => {
-  spaces.readOne(req.params, (err, space) => {
+app.get('/spaces', (req, res) => {
+  spaces.read(req.query, (err, space) => {
     if (err) {
       res.status(400).send(err);
     } else {
