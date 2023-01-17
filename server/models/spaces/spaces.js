@@ -18,8 +18,9 @@ spaces.create = (body, callback) => {
   });
 };
 
-spaces.readOne = ({ room_name }, callback) => {
-  Spaces.findOne({ room_name }, callback);
+spaces.read = ({ space_name }, callback) => {
+  const spaceNameRegex = space_name ? new RegExp(space_name, 'i') : /./;
+  Spaces.find({ space_name: spaceNameRegex }, callback);
 };
 
 spaces.addMember = async (spaceName, username, callback) => {
