@@ -6,7 +6,9 @@ const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
 const compression = require('compression');
-// const db = require('./db');
+const {
+  users, spaces, confessions,
+} = require('./models');
 
 const app = express();
 
@@ -29,6 +31,111 @@ app.get('/', (req, res) => {
   res.status(200).send('Sanctuary API server successfully accessed');
 });
 
-// ROUTES
+// ----------------------------------------
+// POST ROUTES ----------------------------
+// ----------------------------------------
 
+// ENDPT #16
+app.post('/users', (req, res) => {
+  users.create(req.body, (err) => {
+    if (err) {
+      res.status(400).send(err);
+    } else {
+      res.status(201).send('CREATED');
+    }
+  });
+});
+
+// ENDPT #6
+app.post('/spaces', (req, res) => {
+  spaces.create(req.body, (err) => {
+    if (err) {
+      res.status(400).send(err);
+    } else {
+      users.updateSpacesCreated(req.body.space_name, req.body.created_by, (error) => {
+        if (error) {
+          res.status(400).send(error);
+        } else {
+          res.status(201).send('CREATED');
+        }
+      });
+    }
+  });
+});
+
+// ENDPT #4
+app.post('/confessions', (req, res) => {
+  confessions.create(req.body, (err) => {
+    if (err) {
+      res.status(400).send(err);
+    } else {
+      res.status(201).send('CREATED');
+    }
+  });
+});
+
+// ENDPT #5
+app.post('/comments', (req, res) => {
+  confessions.createComment(req.body, (err) => {
+    if (err) {
+      res.status(400).send(err);
+    } else {
+      res.status(201).send('CREATED');
+    }
+  });
+});
+
+// ----------------------------------------
+// GET ROUTES ----------------------------
+// ----------------------------------------
+
+// ENDPT #1
+app.get('/users/:username', (req, res) => {
+  users.readOne(req.params, (err, user) => {
+    if (err) {
+      res.status(400).send(err);
+    } else {
+      res.status(200).send(user);
+    }
+  });
+});
+
+// ENDPT #2
+app.get('/spaces/:space_name', (req, res) => {
+  spaces.readOne(req.params, (err, space) => {
+    if (err) {
+      res.status(400).send(err);
+    } else {
+      res.status(200).send(space);
+    }
+  });
+});
+
+// ----------------------------------------
+// PATCH ROUTES ----------------------------
+// ----------------------------------------
+
+// ENDPT #11
+app.patch('/spaces/:space_name/:username/add', (req, res) => {
+  users.addSpacesJoined(req.params.space_name, req.params.username, (err) => {
+    if (err) {
+      res.status(400).send(err);
+    } else { // UPDATE CODE BELOW
+      res.status(204).send('NO CONTENT');
+    }
+  });
+});
+
+// ENDPT #12
+app.patch('/spaces/:space_name/:username/remove', (req, res) => {
+  users.removeSpacesJoined(req.params.space_name, req.params.username, (err) => {
+    if (err) {
+      res.status(400).send(err);
+    } else { // UPDATE CODE BELOW
+      res.status(204).send('NO CONTENT');
+    }
+  });
+});
+
+// next line allows for Jest coverage report
 module.exports = app;

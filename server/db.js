@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+// eslint-disable-next-line import/no-extraneous-dependencies
+const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 mongoose.set('strictQuery', true);
 
@@ -24,13 +26,12 @@ const usersSchema = new mongoose.Schema({
   ],
 });
 
-const Users = mongoose.model('Users', usersSchema);
+exports.Users = mongoose.model('Users', usersSchema);
 
 const spacesSchema = new mongoose.Schema(
   {
     space_name: { type: String, required: true, unique: true },
     created_by: { type: String, required: true },
-    user_count: { type: Number, default: 0 },
     description: { type: String, default: 'default description' },
     guidelines: [String],
     members: [String],
@@ -38,11 +39,10 @@ const spacesSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-const Spaces = mongoose.model('Users', spacesSchema);
+exports.Spaces = mongoose.model('Spaces', spacesSchema);
 
 const commentsSchema = new mongoose.Schema(
   {
-    comment_id: Number,
     created_by: { type: String, required: true },
     comment: { type: String, required: true },
     reported: [String],
@@ -50,38 +50,19 @@ const commentsSchema = new mongoose.Schema(
   },
   { timestamps: true },
 );
-
-const Comments = mongoose.model('Comments', commentsSchema);
+commentsSchema.plugin(AutoIncrement, { inc_field: 'comment_id' });
 
 const confessionsSchema = new mongoose.Schema(
   {
-    confession_id: Number,
     created_by: { type: String, required: true },
     confession: { type: String, required: true },
     reported: [String],
-    space_name: { type: [String], index: true },
+    space_name: { type: [String], required: true, index: true },
     hugs: { type: Number, default: 0, min: 0 },
+    comments: [commentsSchema],
   },
   { timestamps: true },
 );
+confessionsSchema.plugin(AutoIncrement, { inc_field: 'confession_id' });
 
-const Confessions = mongoose.model('Confessions', confessionsSchema);
-
-// let startingAnswers = [
-//   { answerID: 1 },
-//   { answerID: 2 },
-// ];
-
-// Answers.countDocuments({}, (err, count) => {
-//   if (!count) {
-//     Answers.insertMany(startingAnswers, function(err) {
-//       if (err) {
-//         console.log('err:', err);
-//       } else {
-//         console.log('startingAnswers successfully saved!')
-//       }
-//     })
-//   }
-// })
-
-// module.exports = Answers;
+exports.Confessions = mongoose.model('Confessions', confessionsSchema);
