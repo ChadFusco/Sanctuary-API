@@ -67,7 +67,25 @@ confessions.reportConfession = async (confessionID, username, callback) => {
       }
       return confession.save();
     })
-    .then((confession) => users.readOne(confession.created_by))
+    .then((confession) => users.updateReported(confession.created_by, confession.space_name))
+    // increment reporting user's "reports" object
+    .then(() => users.updateReports(username, reportedConfession.space_name))
+    .then(() => callback())
+    .catch((err) => callback(err));
+};
+
+confessions.reportComment = async (confessionID, commentID) => {
+  let reportedConfession;
+  let reportedComment;
+  await confessions.readConfession(confessionID)
+    .then((confession) => {
+      reportedConfession = confession;
+      return confessions.findComment(confession, commentID);
+    })
+    .then((comment) => {
+      reportedComment = comment;
+      return users.readOne(comment.created_by);
+    })
     // increment reported user's "reported" object
     .then((user) => {
       const reportedUser = user;
@@ -85,38 +103,7 @@ confessions.reportConfession = async (confessionID, username, callback) => {
         });
       }
       return reportedUser.save();
-    })
-    // increment reporting user's "reports" object
-    .then(() => users.readOne(username))
-    .then((user) => {
-      const reportingUser = user;
-      let wasIncremented = false;
-      reportingUser.reports.forEach((space, i) => {
-        if (space.space_name === reportedConfession.space_name) {
-          wasIncremented = true;
-          reportingUser.reports[i].qty += 1;
-        }
-      });
-      if (!wasIncremented) {
-        reportingUser.reports.push({
-          space_name: reportedConfession.space_name,
-          qty: 1,
-        });
-      }
-      return reportingUser.save();
-    })
-    .then(() => callback())
-    .catch((err) => callback(err));
+    });
 };
-
-confessions.reportComment = async (confessionID, commentID) => {
-  let reportedConfession;
-  let reportedComment;
-  await confessions.readConfession(confessionID)
-    .then((confession) => {
-      reportedConfession = confession;
-      return confessions.findComment(confession, commentID);
-    })
-}
 
 module.exports = confessions;

@@ -57,4 +57,46 @@ users.removeSpacesJoined = async (spaceName, username, callback) => {
   });
 };
 
+users.updateReported = async (username, spaceName) => {
+  await users.readOne(username)
+    .then((user) => {
+      const reportedUser = user;
+      let wasIncremented = false;
+      reportedUser.reported.forEach((space, i) => {
+        if (space.space_name === spaceName) {
+          wasIncremented = true;
+          reportedUser.reported[i].qty += 1;
+        }
+      });
+      if (!wasIncremented) {
+        reportedUser.reported.push({
+          space_name: spaceName,
+          qty: 1,
+        });
+      }
+      return reportedUser.save();
+    });
+};
+
+users.updateReports = async (username, spaceName) => {
+  await users.readOne(username)
+    .then((user) => {
+      const reportingUser = user;
+      let wasIncremented = false;
+      reportingUser.reports.forEach((space, i) => {
+        if (space.space_name === spaceName) {
+          wasIncremented = true;
+          reportingUser.reports[i].qty += 1;
+        }
+      });
+      if (!wasIncremented) {
+        reportingUser.reports.push({
+          space_name: spaceName,
+          qty: 1,
+        });
+      }
+      return reportingUser.save();
+    });
+};
+
 module.exports = users;
