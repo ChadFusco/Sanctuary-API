@@ -224,5 +224,16 @@ app.patch('/spaces/:space_name/:username/remove', (req, res) => {
   });
 });
 
+// ENDPT #18
+app.patch('/confessions/:confession_id/hug', (req, res) => {
+  confessions.addHug(req.params, (err) => {
+    if (err) {
+      res.status(400).send(err);
+    } else {
+      res.status(204).send('NO CONTENT');
+    }
+  });
+});
+
 // next line allows for Jest coverage report
 module.exports = app;
