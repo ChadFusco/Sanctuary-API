@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable camelcase */
 // REQUIRE STATEMENTS
 require('dotenv').config();
@@ -49,13 +50,18 @@ app.get('/users/:username', (req, res) => {
 
 // ENDPT #2
 app.get('/spaces', (req, res) => {
-  spaces.read(req.query, (err, space) => {
-    if (err) {
-      res.status(400).send(err);
-    } else {
-      res.status(200).send(space);
-    }
-  });
+  spaces.read(
+    req.query.space_name,
+    (err, space) => {
+      if (err) {
+        res.status(400).send(err);
+      } else {
+        res.status(200).send(space);
+      }
+    },
+    req.query.page,
+    req.query.count,
+  );
 });
 
 // ENDPT #3
@@ -227,6 +233,17 @@ app.patch('/spaces/:space_name/:username/remove', (req, res) => {
 // ENDPT #17
 app.patch('/spaces/:space_name', (req, res) => {
   spaces.update(req.params.space_name, req.body, (err) => {
+    if (err) {
+      res.status(400).send(err);
+    } else {
+      res.status(204).send('NO CONTENT');
+    }
+  });
+});
+
+// ENDPT #18
+app.patch('/confessions/:confession_id/hug', (req, res) => {
+  confessions.addHug(req.params, (err) => {
     if (err) {
       res.status(400).send(err);
     } else {

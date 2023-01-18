@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 const { Confessions } = require('../../db');
 const users = require('../users/users');
 
@@ -100,6 +101,10 @@ confessions.reportComment = async (confessionID, commentID, reportingUsername, c
       return callback();
     })
     .catch((err) => callback(err));
+};
+
+confessions.addHug = ({ confession_id }, callback) => {
+  Confessions.findOneAndUpdate({ confession_id }, { $inc: { hugs: 1 } }, callback);
 };
 
 module.exports = confessions;
