@@ -12,12 +12,11 @@ confessions.findConfession = (spaceName, username, reported, callback, page = 1,
   const usernameRegex = username ? new RegExp(username, 'i') : /./;
   const skip = (page - 1) * count;
   const query = { space_name: spaceNameRegex, created_by: usernameRegex };
-  if (reported === 'true') {
-    query.reported = { $not: { $size: 0 } };
-  } else if (reported === 'false') {
-    query.reported = { $size: 0 };
-  }
-  console.log('query:', query);
+  // if (reported === 'true') {
+  //   query.reported = { $not: { $size: 0 } };
+  // } else if (reported === 'false') {
+  //   query.reported = { $size: 0 };
+  // }
   Confessions.find(query, null, { skip, limit: count }, callback);
 };
 
