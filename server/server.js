@@ -63,6 +63,7 @@ app.get('/confessions', (req, res) => {
   confessions.findConfession(
     req.query.space_name,
     req.query.username,
+    req.query.reported,
     (err, foundConfessions) => {
       if (err) {
         res.status(400).send(err);
