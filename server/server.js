@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable camelcase */
 // REQUIRE STATEMENTS
 require('dotenv').config();
