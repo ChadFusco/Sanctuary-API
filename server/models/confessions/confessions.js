@@ -20,12 +20,11 @@ confessions.findConfession = (spaceName, username, callback, page = 1, count = 4
   }, callback);
 };
 
-confessions.findComment = async (confessionID, commentID) => {
-  const foundConfession = await confessions.readConfession(confessionID);
-  return foundConfession.comments.reduce((acc, val) => (
+confessions.findComment = async (confession, commentID) => (
+  confession.comments.reduce((acc, val) => (
     val.comment_id === commentID ? val : acc
-  ));
-};
+  ))
+);
 
 confessions.create = (body, callback) => {
   Confessions.create({
@@ -58,55 +57,48 @@ confessions.popPlopComment = async (confessionID, commentID, delta, callback) =>
     .catch((err) => callback(err));
 };
 
-confessions.reportConfession = async (confessionID, username, callback) => {
+confessions.reportConfession = async (confessionID, reportingUsername, callback) => {
   let reportedConfession;
   await confessions.readConfession(confessionID)
     .then((confession) => {
       reportedConfession = confession;
-      if (!confession.reported.some((item) => item === username)) {
-        confession.reported.push(username);
+      if (!confession.reported.some((item) => item === reportingUsername)) {
+        confession.reported.push(reportingUsername);
+        return reportedConfession;
       }
-      return confession.save();
+      return new Error('confession has already been reported by this user');
     })
-    .then((confession) => users.readOne(confession.created_by))
-    // increment reported user's "reported" object
-    .then((user) => {
-      const reportedUser = user;
-      let wasIncremented = false;
-      reportedUser.reported.forEach((space, i) => {
-        if (space.space_name === reportedConfession.space_name) {
-          wasIncremented = true;
-          reportedUser.reported[i].qty += 1;
-        }
-      });
-      if (!wasIncremented) {
-        reportedUser.reported.push({
-          space_name: reportedConfession.space_name,
-          qty: 1,
-        });
+    .then((confession) => users.updateReported(confession.created_by, confession.space_name))
+    .then(() => users.updateReports(reportingUsername, reportedConfession.space_name))
+    .then(() => {
+      reportedConfession.save();
+      return callback();
+    })
+    .catch((err) => callback(err));
+};
+
+confessions.reportComment = async (confessionID, commentID, reportingUsername, callback) => {
+  let reportedConfession;
+  await confessions.readConfession(confessionID)
+    .then((confession) => {
+      reportedConfession = confession;
+      const commentIdx = confession.comments.reduce((acc, val, i) => (
+        val.comment_id === commentID ? i : acc
+      ), 0);
+      if (!confession.comments[commentIdx].reported.some((item) => item === reportingUsername)) {
+        confession.comments[commentIdx].reported.push(reportingUsername);
+        return confession.comments[commentIdx].created_by;
       }
-      return reportedUser.save();
+      return new Error('comment has already been reported by this user');
     })
-    // increment reporting user's "reports" object
-    .then(() => users.readOne(username))
-    .then((user) => {
-      const reportingUser = user;
-      let wasIncremented = false;
-      reportingUser.reports.forEach((space, i) => {
-        if (space.space_name === reportedConfession.space_name) {
-          wasIncremented = true;
-          reportingUser.reports[i].qty += 1;
-        }
-      });
-      if (!wasIncremented) {
-        reportingUser.reports.push({
-          space_name: reportedConfession.space_name,
-          qty: 1,
-        });
-      }
-      return reportingUser.save();
+    .then((reportedUsername) => (
+      users.updateReported(reportedUsername, reportedConfession.space_name)
+    ))
+    .then(() => users.updateReports(reportingUsername, reportedConfession.space_name))
+    .then(() => {
+      reportedConfession.save();
+      return callback();
     })
-    .then(() => callback())
     .catch((err) => callback(err));
 };
 
