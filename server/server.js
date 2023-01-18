@@ -49,13 +49,18 @@ app.get('/users/:username', (req, res) => {
 
 // ENDPT #2
 app.get('/spaces', (req, res) => {
-  spaces.read(req.query, (err, space) => {
-    if (err) {
-      res.status(400).send(err);
-    } else {
-      res.status(200).send(space);
-    }
-  });
+  spaces.read(
+    req.query.space_name,
+    (err, space) => {
+      if (err) {
+        res.status(400).send(err);
+      } else {
+        res.status(200).send(space);
+      }
+    },
+    req.query.page,
+    req.query.count,
+  );
 });
 
 // ENDPT #3
