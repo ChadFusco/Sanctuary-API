@@ -18,10 +18,20 @@ spaces.create = (body, callback) => {
   });
 };
 
-spaces.read = (spaceName, callback, page = 1, count = 4) => {
-  const spaceNameRegex = spaceName ? new RegExp(spaceName, 'i') : /./;
-  const skip = (page - 1) * count;
-  Spaces.find({ space_name: spaceNameRegex }, null, { skip, limit: count }, callback);
+spaces.update = (space_name, changes, callback) => {
+  const spaceUpdates = {};
+  if (changes.description) {
+    spaceUpdates.description = changes.description;
+  }
+  if (changes.guidelines) {
+    spaceUpdates.guidelines = changes.guidelines;
+  }
+  Spaces.findOneAndUpdate({ space_name }, spaceUpdates, callback);
+};
+
+spaces.read = ({ space_name }, callback) => {
+  const spaceNameRegex = space_name ? new RegExp(space_name, 'i') : /./;
+  Spaces.find({ space_name: spaceNameRegex }, callback);
 };
 
 spaces.addMember = async (spaceName, username, callback) => {

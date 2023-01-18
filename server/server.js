@@ -218,9 +218,20 @@ app.patch('/spaces/:space_name/:username/add', (req, res) => {
   });
 });
 
-// ENDPT #12
+// ENDPT #7
 app.patch('/spaces/:space_name/:username/remove', (req, res) => {
   users.removeSpacesJoined(req.params.space_name, req.params.username, (err) => {
+    if (err) {
+      res.status(400).send(err);
+    } else {
+      res.status(204).send('NO CONTENT');
+    }
+  });
+});
+
+// ENDPT #17
+app.patch('/spaces/:space_name', (req, res) => {
+  spaces.update(req.params.space_name, req.body, (err) => {
     if (err) {
       res.status(400).send(err);
     } else {
