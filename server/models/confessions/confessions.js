@@ -7,17 +7,17 @@ confessions.readConfession = (confessionID) => (
   Confessions.findOne({ confession_id: confessionID })
 );
 
-confessions.findConfession = (spaceName, username, callback, page = 1, count = 4) => {
+confessions.findConfession = (spaceName, username, reported, callback, page = 1, count = 4) => {
   const spaceNameRegex = spaceName ? new RegExp(spaceName, 'i') : /./;
   const usernameRegex = username ? new RegExp(username, 'i') : /./;
   const skip = (page - 1) * count;
-  Confessions.find({
-    space_name: spaceNameRegex,
-    created_by: usernameRegex,
-  }, null, {
-    skip,
-    limit: count,
-  }, callback);
+  const query = { space_name: spaceNameRegex, created_by: usernameRegex };
+  // if (reported === 'true') {
+  //   query.reported = { $not: { $size: 0 } };
+  // } else if (reported === 'false') {
+  //   query.reported = { $size: 0 };
+  // }
+  Confessions.find(query, null, { skip, limit: count }, callback);
 };
 
 confessions.findComment = async (confession, commentID) => (

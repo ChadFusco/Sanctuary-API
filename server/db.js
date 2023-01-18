@@ -46,7 +46,7 @@ const commentsSchema = new mongoose.Schema(
     created_by: { type: String, required: true },
     comment: { type: String, required: true },
     reported: [String],
-    pops: { type: Number, default: 0, min: 0 },
+    pops: { type: Number, default: 1, min: 1 },
   },
   { timestamps: true },
 );
