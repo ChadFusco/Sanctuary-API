@@ -111,10 +111,20 @@ confessions.deleteConfession = ({ confession_id }, callback) => {
   Confessions.deleteOne({ confession_id }, callback);
 };
 
+confessions.deleteConfBySpaceAndUser = async ({ space_name, username }) => (
+  Confessions.deleteMany({ space_name, created_by: username })
+);
+
 confessions.deleteComment = async ({ confession_id, comment_id }, callback) => {
   Confessions.findOneAndUpdate({ confession_id }, {
     $pull: { comments: { comment_id } },
   }, callback);
 };
+
+confessions.deleteCommentsBySpaceAndUser = async ({ space_name, username }) => (
+  Confessions.findOneAndUpdate({ space_name }, {
+    $pull: { comments: { created_by: username } },
+  }, { multi: true })
+);
 
 module.exports = confessions;

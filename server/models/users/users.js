@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 const { Users } = require('../../db');
 const spaces = require('../spaces/spaces');
 
@@ -44,17 +45,11 @@ users.addSpacesJoined = async (spaceName, username, callback) => {
   }
 };
 
-users.removeSpacesJoined = async (spaceName, username, callback) => {
+users.removeSpacesJoined = async ({ space_name, username }) => {
   const foundUser = await Users.findOne({ username });
-  foundUser.spaces_joined = foundUser.spaces_joined.filter((space) => space !== spaceName);
-  spaces.removeMember(spaceName, username, (err) => {
-    if (err) {
-      callback(err);
-    } else {
-      foundUser.save();
-      callback();
-    }
-  });
+  foundUser.spaces_joined = foundUser.spaces_joined.filter((space) => space !== space_name);
+  await spaces.removeMember(space_name, username);
+  return foundUser.save();
 };
 
 users.updateReported = async (username, spaceName) => {
@@ -97,6 +92,11 @@ users.updateReports = async (username, spaceName) => {
       }
       return reportingUser.save();
     });
+};
+
+users.ban = async ({ space_name, username }) => {
+  console.log('banning in progress for username:', username);
+  return Users.findOneAndUpdate({ username }, { $push: { banned: space_name } });
 };
 
 module.exports = users;
