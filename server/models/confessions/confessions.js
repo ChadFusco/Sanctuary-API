@@ -92,7 +92,7 @@ confessions.createComment = async (body, callback) => {
 confessions.popPlopComment = async (confessionID, commentID, delta, callback) => {
   const foundConfession = await confessions.readConfession(confessionID);
   const foundCommentIdx = foundConfession.comments.reduce((acc, val, i) => (
-    val.comment_id === commentID ? i : acc
+    val.comment_id === parseInt(commentID, 10) ? i : acc
   ), 0);
   foundConfession.comments[foundCommentIdx].pops += delta;
   foundConfession.save()
