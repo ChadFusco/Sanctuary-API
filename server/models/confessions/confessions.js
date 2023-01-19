@@ -4,21 +4,63 @@ const users = require('../users/users');
 
 const confessions = {};
 
-confessions.readConfession = (confessionID) => (
+confessions.readConfession = async (confessionID) => (
   Confessions.findOne({ confession_id: confessionID })
 );
 
-confessions.findConfession = (spaceName, username, reported, callback, page = 1, count = 4) => {
+// confessions.findConfession = async (spaceName, username, page = 1, count = 4) => {
+//   const spaceNameRegex = spaceName ? new RegExp(spaceName, 'i') : /./;
+//   const usernameRegex = username ? new RegExp(username, 'i') : /./;
+//   const skip = (page - 1) * count;
+//   const query = { space_name: spaceNameRegex, created_by: usernameRegex };
+//   // if (reported === 'true') {
+//   //   query.reported = { $not: { $size: 0 } };
+//   // } else if (reported === 'false') {
+//   //   query.reported = { $size: 0 };
+//   // }
+//   return Confessions.find(query, null, { skip, limit: count });
+// };
+
+confessions.findConfession = async (spaceName, username, spaceCreator, page = 1, count = 4) => {
   const spaceNameRegex = spaceName ? new RegExp(spaceName, 'i') : /./;
   const usernameRegex = username ? new RegExp(username, 'i') : /./;
   const skip = (page - 1) * count;
-  const query = { space_name: spaceNameRegex, created_by: usernameRegex };
-  // if (reported === 'true') {
-  //   query.reported = { $not: { $size: 0 } };
-  // } else if (reported === 'false') {
-  //   query.reported = { $size: 0 };
-  // }
-  Confessions.find(query, null, { skip, limit: count }, callback);
+  const spaceCreatorRegex = spaceCreator ? new RegExp(spaceCreator, 'i') : /./;
+  return Confessions
+    .aggregate([
+      { $match: { space_name: spaceNameRegex, created_by: usernameRegex } },
+      {
+        $lookup: {
+          from: 'spaces', localField: 'space_name', foreignField: 'space_name', as: 'space',
+        },
+      },
+      {
+        $project: {
+          space: { $arrayElemAt: ['$space', 0] },
+          created_by: 1,
+          confession: 1,
+          reported: 1,
+          space_name: 1,
+          hugs: 1,
+          comments: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          confession_id: 1,
+        },
+      },
+      { $match: { 'space.created_by': spaceCreatorRegex } },
+      {
+        $addFields: {
+          space_creator: '$space.created_by',
+        },
+      },
+      {
+        $project: {
+          space: 0,
+        },
+      },
+    ])
+    .skip(skip).limit(count);
 };
 
 confessions.findComment = async (confession, commentID) => (

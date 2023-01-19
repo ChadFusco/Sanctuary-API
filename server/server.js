@@ -67,42 +67,36 @@ app.get('/spaces', (req, res) => {
 // ENDPT #3
 app.get('/confessions', (req, res) => {
   const {
-    reported, space_name, username, page, count,
+    reported, space_name, username, space_creator, page, count,
   } = req.query;
-  confessions.findConfession(
-    space_name,
-    username,
-    reported,
-    (err, foundConfessions) => {
-      if (err) {
-        res.status(400).send(err);
-      } else {
-        let filteredConfessions = foundConfessions;
-        // console.log('filteredConfessions:', filteredConfessions);
-        if (reported !== undefined) {
-          // filter comments on each confession:
-          filteredConfessions = foundConfessions.map((confession) => {
-            let filteredConfession = { ...confession };
-            filteredConfession = filteredConfession._doc;
-            const filteredComments = filteredConfession.comments.filter((comment) => (
-              (reported === 'true' ? (comment.reported.length > 0) : (comment.reported.length === 0))
-            ));
-            // console.log('new confession:', { ...confession, comments: filteredComments });
-            return { ...filteredConfession, comments: filteredComments };
-          });
-          filteredConfessions = filteredConfessions.filter((confession) => {
-            console.log('confession:', confession);
-            let filter = confession.reported.length > 0 || confession.comments.length > 0;
-            filter = reported === 'true' ? filter : !filter;
-            return filter;
-          });
-        }
-        res.status(200).send(filteredConfessions);
+  confessions.findConfession(space_name, username, space_creator, page, count)
+    .then((foundConfessions) => {
+      let filteredConfessions = foundConfessions;
+      if (reported !== undefined) {
+        filteredConfessions = filteredConfessions.map((confession) => {
+          let filteredConfession = { ...confession };
+          filteredConfession = filteredConfession._doc;
+          const filteredComments = filteredConfession.comments.filter((comment) => (
+            (reported === 'true' ? (comment.reported.length > 0) : (comment.reported.length === 0))
+          ));
+          return { ...filteredConfession, comments: filteredComments };
+        });
+        filteredConfessions = filteredConfessions.filter((confession) => {
+          let filter = confession.reported.length > 0 || confession.comments.length > 0;
+          filter = (reported === 'true' ? filter : !filter);
+          return filter;
+        });
       }
-    },
-    page,
-    count,
-  );
+      res.status(200).send(filteredConfessions);
+    })
+    .catch((err) => res.status(400).send(err));
+});
+
+// ENDPT #19
+app.get('/confessions/:confession_id', (req, res) => {
+  confessions.readConfession(req.params.confession_id)
+    .then((confession) => res.status(200).send(confession))
+    .catch((err) => res.status(400).send(err));
 });
 
 // ----------------------------------------
@@ -237,7 +231,7 @@ app.patch('/spaces/:space_name/:username/ban', (req, res) => {
     // second, delete all the user's confessions in the space
     .then(() => confessions.deleteConfBySpaceAndUser(req.params))
     // third, remove the user from the space,
-    // incl updating the user's "space_created" field and the space's "members" field
+    // incl updating the user's "space_joined" field and the space's "members" field
     .then(() => users.removeSpacesJoined(req.params))
     // fourth, add the space_name to the user's "banned" array
     .then(() => users.ban(req.params))
