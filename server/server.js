@@ -34,7 +34,7 @@ app.get('/', (req, res) => {
 });
 
 // ----------------------------------------
-// GET ROUTES ----------------------------
+// GET ROUTES -----------------------------
 // ----------------------------------------
 
 // ENDPT #1
@@ -160,7 +160,7 @@ app.post('/comments', (req, res) => {
 });
 
 // ----------------------------------------
-// PATCH ROUTES ----------------------------
+// PATCH ROUTES ---------------------------
 // ----------------------------------------
 
 // ENDPT #7
@@ -219,15 +219,30 @@ app.patch('/spaces/:space_name/:username/add', (req, res) => {
   });
 });
 
-// ENDPT #7
+// ENDPT #12
 app.patch('/spaces/:space_name/:username/remove', (req, res) => {
-  users.removeSpacesJoined(req.params.space_name, req.params.username, (err) => {
+  users.removeSpacesJoined(req.params, (err) => {
     if (err) {
       res.status(400).send(err);
     } else {
       res.status(204).send('NO CONTENT');
     }
   });
+});
+
+// ENDPT #13
+app.patch('/spaces/:space_name/:username/ban', (req, res) => {
+  // first, delete all the user's comments in the space
+  confessions.deleteCommentsBySpaceAndUser(req.params)
+    // second, delete all the user's confessions in the space
+    .then(() => confessions.deleteConfBySpaceAndUser(req.params))
+    // third, remove the user from the space,
+    // incl updating the user's "space_created" field and the space's "members" field
+    .then(() => users.removeSpacesJoined(req.params))
+    // fourth, add the space_name to the user's "banned" array
+    .then(() => users.ban(req.params))
+    .then(() => res.status(204).send('NO CONTENT'))
+    .catch((err) => res.status(400).send(err));
 });
 
 // ENDPT #17
@@ -244,6 +259,32 @@ app.patch('/spaces/:space_name', (req, res) => {
 // ENDPT #18
 app.patch('/confessions/:confession_id/hug', (req, res) => {
   confessions.addHug(req.params, (err) => {
+    if (err) {
+      res.status(400).send(err);
+    } else {
+      res.status(204).send('NO CONTENT');
+    }
+  });
+});
+
+// ----------------------------------------
+// DELETE ROUTES --------------------------
+// ----------------------------------------
+
+// ENDPT #14
+app.delete('/confessions/:confession_id', (req, res) => {
+  confessions.deleteConfession(req.params, (err) => {
+    if (err) {
+      res.status(400).send(err);
+    } else {
+      res.status(204).send('NO CONTENT');
+    }
+  });
+});
+
+// ENDPT #15
+app.delete('/confessions/:confession_id/:comment_id', (req, res) => {
+  confessions.deleteComment(req.params, (err) => {
     if (err) {
       res.status(400).send(err);
     } else {

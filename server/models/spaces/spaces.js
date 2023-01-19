@@ -45,13 +45,11 @@ spaces.addMember = async (spaceName, username, callback) => {
     .catch((err) => callback(err));
 };
 
-spaces.removeMember = async (spaceName, username, callback) => {
+spaces.removeMember = async (spaceName, username) => {
   const foundSpace = await Spaces.findOne({ space_name: spaceName });
   foundSpace.members.push(username);
   foundSpace.members = foundSpace.members.filter((member) => member !== username);
-  await foundSpace.save()
-    .then(() => callback())
-    .catch((err) => callback(err));
+  return foundSpace.save();
 };
 
 module.exports = spaces;
