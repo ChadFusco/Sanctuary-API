@@ -30,9 +30,7 @@ spaces.update = (space_name, changes, callback) => {
 };
 
 spaces.read = (space_name, callback, page = 1, count = 4) => {
-  console.log('space_name:', space_name);
   const spaceNameRegex = space_name ? new RegExp(space_name, 'i') : /./;
-  console.log('spaceNameRegex:', spaceNameRegex);
   const skip = (page - 1) * count;
   Spaces.find({ space_name: spaceNameRegex }, null, { skip, limit: count }, callback);
 };
