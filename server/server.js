@@ -67,13 +67,13 @@ app.get('/spaces', (req, res) => {
 // ENDPT #3
 app.get('/confessions', (req, res) => {
   const {
-    reported, space_name, username, page, count,
+    reported, space_name, username, space_creator, page, count,
   } = req.query;
-  confessions.findConfession(space_name, username, reported, page, count)
+  confessions.findConfession(space_name, username, space_creator, page, count)
     .then((foundConfessions) => {
       let filteredConfessions = foundConfessions;
       if (reported !== undefined) {
-        filteredConfessions = foundConfessions.map((confession) => {
+        filteredConfessions = filteredConfessions.map((confession) => {
           let filteredConfession = { ...confession };
           filteredConfession = filteredConfession._doc;
           const filteredComments = filteredConfession.comments.filter((comment) => (
@@ -90,6 +90,17 @@ app.get('/confessions', (req, res) => {
       res.status(200).send(filteredConfessions);
     })
     .catch((err) => res.status(400).send(err));
+});
+
+// ENDPT #19
+app.post('/users', (req, res) => {
+  users.create(req.body, (err) => {
+    if (err) {
+      res.status(400).send(err);
+    } else {
+      res.status(201).send('CREATED');
+    }
+  });
 });
 
 // ----------------------------------------
