@@ -69,40 +69,27 @@ app.get('/confessions', (req, res) => {
   const {
     reported, space_name, username, page, count,
   } = req.query;
-  confessions.findConfession(
-    space_name,
-    username,
-    reported,
-    (err, foundConfessions) => {
-      if (err) {
-        res.status(400).send(err);
-      } else {
-        let filteredConfessions = foundConfessions;
-        // console.log('filteredConfessions:', filteredConfessions);
-        if (reported !== undefined) {
-          // filter comments on each confession:
-          filteredConfessions = foundConfessions.map((confession) => {
-            let filteredConfession = { ...confession };
-            filteredConfession = filteredConfession._doc;
-            const filteredComments = filteredConfession.comments.filter((comment) => (
-              (reported === 'true' ? (comment.reported.length > 0) : (comment.reported.length === 0))
-            ));
-            // console.log('new confession:', { ...confession, comments: filteredComments });
-            return { ...filteredConfession, comments: filteredComments };
-          });
-          filteredConfessions = filteredConfessions.filter((confession) => {
-            console.log('confession:', confession);
-            let filter = confession.reported.length > 0 || confession.comments.length > 0;
-            filter = reported === 'true' ? filter : !filter;
-            return filter;
-          });
-        }
-        res.status(200).send(filteredConfessions);
+  confessions.findConfession(space_name, username, reported, page, count)
+    .then((foundConfessions) => {
+      let filteredConfessions = foundConfessions;
+      if (reported !== undefined) {
+        filteredConfessions = foundConfessions.map((confession) => {
+          let filteredConfession = { ...confession };
+          filteredConfession = filteredConfession._doc;
+          const filteredComments = filteredConfession.comments.filter((comment) => (
+            (reported === 'true' ? (comment.reported.length > 0) : (comment.reported.length === 0))
+          ));
+          return { ...filteredConfession, comments: filteredComments };
+        });
+        filteredConfessions = filteredConfessions.filter((confession) => {
+          let filter = confession.reported.length > 0 || confession.comments.length > 0;
+          filter = (reported === 'true' ? filter : !filter);
+          return filter;
+        });
       }
-    },
-    page,
-    count,
-  );
+      res.status(200).send(filteredConfessions);
+    })
+    .catch((err) => res.status(400).send(err));
 });
 
 // ----------------------------------------

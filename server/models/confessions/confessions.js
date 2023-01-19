@@ -8,7 +8,7 @@ confessions.readConfession = (confessionID) => (
   Confessions.findOne({ confession_id: confessionID })
 );
 
-confessions.findConfession = (spaceName, username, reported, callback, page = 1, count = 4) => {
+confessions.findConfession = async (spaceName, username, reported, page = 1, count = 4) => {
   const spaceNameRegex = spaceName ? new RegExp(spaceName, 'i') : /./;
   const usernameRegex = username ? new RegExp(username, 'i') : /./;
   const skip = (page - 1) * count;
@@ -18,8 +18,12 @@ confessions.findConfession = (spaceName, username, reported, callback, page = 1,
   // } else if (reported === 'false') {
   //   query.reported = { $size: 0 };
   // }
-  Confessions.find(query, null, { skip, limit: count }, callback);
+  return Confessions.find(query, null, { skip, limit: count });
 };
+
+// confessions.findConfBySpaceCreator = async (username, reported) => {
+//   Confessions.aggregate()
+// };
 
 confessions.findComment = async (confession, commentID) => (
   confession.comments.reduce((acc, val) => (
