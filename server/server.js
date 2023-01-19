@@ -34,7 +34,7 @@ app.get('/', (req, res) => {
 });
 
 // ----------------------------------------
-// GET ROUTES ----------------------------
+// GET ROUTES -----------------------------
 // ----------------------------------------
 
 // ENDPT #1
@@ -160,7 +160,7 @@ app.post('/comments', (req, res) => {
 });
 
 // ----------------------------------------
-// PATCH ROUTES ----------------------------
+// PATCH ROUTES ---------------------------
 // ----------------------------------------
 
 // ENDPT #7
@@ -244,6 +244,21 @@ app.patch('/spaces/:space_name', (req, res) => {
 // ENDPT #18
 app.patch('/confessions/:confession_id/hug', (req, res) => {
   confessions.addHug(req.params, (err) => {
+    if (err) {
+      res.status(400).send(err);
+    } else {
+      res.status(204).send('NO CONTENT');
+    }
+  });
+});
+
+// ----------------------------------------
+// DELETE ROUTES --------------------------
+// ----------------------------------------
+
+// ENDPT #14
+app.delete('/confessions/:confession_id', (req, res) => {
+  confessions.delete(req.params, (err) => {
     if (err) {
       res.status(400).send(err);
     } else {

@@ -107,4 +107,8 @@ confessions.addHug = ({ confession_id }, callback) => {
   Confessions.findOneAndUpdate({ confession_id }, { $inc: { hugs: 1 } }, callback);
 };
 
+confessions.delete = ({ confession_id }, callback) => {
+  Confessions.deleteOne({ confession_id }, callback);
+};
+
 module.exports = confessions;
