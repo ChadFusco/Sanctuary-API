@@ -258,7 +258,18 @@ app.patch('/confessions/:confession_id/hug', (req, res) => {
 
 // ENDPT #14
 app.delete('/confessions/:confession_id', (req, res) => {
-  confessions.delete(req.params, (err) => {
+  confessions.deleteConfession(req.params, (err) => {
+    if (err) {
+      res.status(400).send(err);
+    } else {
+      res.status(204).send('NO CONTENT');
+    }
+  });
+});
+
+// ENDPT #15
+app.delete('/confessions/:confession_id/:comment_id', (req, res) => {
+  confessions.deleteComment(req.params, (err) => {
     if (err) {
       res.status(400).send(err);
     } else {
