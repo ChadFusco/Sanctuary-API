@@ -4,7 +4,7 @@ const users = require('../users/users');
 
 const confessions = {};
 
-confessions.readConfession = (confessionID) => (
+confessions.readConfession = async (confessionID) => (
   Confessions.findOne({ confession_id: confessionID })
 );
 

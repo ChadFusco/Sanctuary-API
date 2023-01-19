@@ -93,14 +93,10 @@ app.get('/confessions', (req, res) => {
 });
 
 // ENDPT #19
-app.post('/users', (req, res) => {
-  users.create(req.body, (err) => {
-    if (err) {
-      res.status(400).send(err);
-    } else {
-      res.status(201).send('CREATED');
-    }
-  });
+app.get('/confessions/:confession_id', (req, res) => {
+  confessions.readConfession(req.params.confession_id)
+    .then((confession) => res.status(200).send(confession))
+    .catch((err) => res.status(400).send(err));
 });
 
 // ----------------------------------------
