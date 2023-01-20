@@ -12,6 +12,21 @@ const {
   users, spaces, confessions,
 } = require('./models');
 
+// HELPER FUNCTIONS
+
+const changePopsPlopsListToInt = (conf) => {
+  const filteredConfession = { ...conf };
+  const commentsWithPops = filteredConfession.comments.map((comment) => {
+    const newComment = { ...comment };
+    const pops = Object.keys(newComment.pops_list || {}).length
+      - Object.keys(newComment.plops_list || {}).length;
+    delete newComment.plops_list;
+    delete newComment.pops_list;
+    return { ...newComment, pops };
+  });
+  return { ...filteredConfession, comments: commentsWithPops };
+};
+
 const app = express();
 
 // APP-WIDE MIDDLEWARE
@@ -86,6 +101,10 @@ app.get('/confessions', (req, res) => {
           return filter;
         });
       }
+      // convert plops_list and pops_list to pops
+      filteredConfessions = filteredConfessions.map((confession) => (
+        changePopsPlopsListToInt(confession)
+      ));
       res.status(200).send(filteredConfessions);
     })
     .catch((err) => res.status(400).send(err));
@@ -94,6 +113,7 @@ app.get('/confessions', (req, res) => {
 // ENDPT #19
 app.get('/confessions/:confession_id', (req, res) => {
   confessions.readConfession(req.params.confession_id)
+    .then((conf) => changePopsPlopsListToInt(conf.toObject()))
     .then((conf) => res.status(conf ? 200 : 404).send(conf))
     .catch((err) => res.status(400).send(err));
 });
@@ -180,25 +200,17 @@ app.patch('/confessions/:confession_id/:comment_id/report/:username', (req, res)
 });
 
 // ENDPT #9
-app.patch('/confessions/:confession_id/:comment_id/pop', (req, res) => {
-  confessions.popPlopComment(req.params.confession_id, req.params.comment_id, 1, (err) => {
-    if (err) {
-      res.status(400).send(err);
-    } else {
-      res.status(204).send('NO CONTENT');
-    }
-  });
+app.patch('/confessions/:confession_id/:comment_id/pop/:username', (req, res) => {
+  confessions.popPlop(req.params.confession_id, req.params.comment_id, req.params.username, true)
+    .then(() => res.status(204).send('NO CONTENT'))
+    .catch((err) => res.status(400).send(err));
 });
 
 // ENDPT #10
-app.patch('/confessions/:confession_id/:comment_id/plop', (req, res) => {
-  confessions.popPlopComment(req.params.confession_id, req.params.comment_id, -1, (err) => {
-    if (err) {
-      res.status(400).send(err);
-    } else {
-      res.status(204).send('NO CONTENT');
-    }
-  });
+app.patch('/confessions/:confession_id/:comment_id/plop/:username', (req, res) => {
+  confessions.popPlop(req.params.confession_id, req.params.comment_id, req.params.username, false)
+    .then(() => res.status(204).send('NO CONTENT'))
+    .catch((err) => res.status(400).send(err));
 });
 
 // ENDPT #11
@@ -213,23 +225,12 @@ app.patch('/spaces/:space_name/:username/add', (req, res) => {
 });
 
 // ENDPT #12
-// app.patch('/spaces/:space_name/:username/remove', (req, res) => {
-//   console.log('req.params:', req.params);
-//   users.removeSpacesJoined(req.params, (err) => {
-//     if (err) {
-//       res.status(400).send(err);
-//     } else {
-//       res.status(204).send('NO CONTENT');
-//     }
-//   });
-// });
 app.patch('/spaces/:space_name/:username/remove', (req, res) => {
   console.log('req.params:', req.params);
   users.removeSpacesJoined(req.params)
     .then(() => res.status(204).send('NO CONTENT'))
     .catch((err) => res.status(400).send(err));
 });
-// conf ? 200 : 404
 
 // ENDPT #13
 app.patch('/spaces/:space_name/:username/ban', (req, res) => {

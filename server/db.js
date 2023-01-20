@@ -31,7 +31,7 @@ exports.Users = mongoose.model('Users', usersSchema);
 const spacesSchema = new mongoose.Schema(
   {
     space_name: { type: String, required: true, unique: true },
-    created_by: { type: String, required: true },
+    created_by: { type: String, required: true, index: true },
     description: { type: String, default: 'default description' },
     guidelines: [String],
     members: [String],
@@ -41,12 +41,25 @@ const spacesSchema = new mongoose.Schema(
 
 exports.Spaces = mongoose.model('Spaces', spacesSchema);
 
+const popsSchema = new mongoose.Schema(
+  {
+    username: { type: String, required: true, index: true },
+    pop_plop: { type: Boolean, required: true, index: true },
+  },
+);
+
+exports.Pops = mongoose.model('Pops', popsSchema);
+
 const commentsSchema = new mongoose.Schema(
   {
     created_by: { type: String, required: true },
     comment: { type: String, required: true },
     reported: [String],
-    pops: { type: Number, default: 1 },
+    pops_list: { type: Object, default: { } },
+    plops_list: { type: Object, default: { } },
+    // plops: {
+    //   username: { type: Boolean, default: false },
+    // },
   },
   { timestamps: true },
 );
