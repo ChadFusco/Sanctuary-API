@@ -94,7 +94,7 @@ app.get('/confessions', (req, res) => {
 // ENDPT #19
 app.get('/confessions/:confession_id', (req, res) => {
   confessions.readConfession(req.params.confession_id)
-    .then((confession) => res.status(200).send(confession))
+    .then((conf) => res.status(conf ? 200 : 404).send(conf))
     .catch((err) => res.status(400).send(err));
 });
 
