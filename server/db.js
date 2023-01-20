@@ -31,7 +31,7 @@ exports.Users = mongoose.model('Users', usersSchema);
 const spacesSchema = new mongoose.Schema(
   {
     space_name: { type: String, required: true, unique: true },
-    created_by: { type: String, required: true },
+    created_by: { type: String, required: true, index: true },
     description: { type: String, default: 'default description' },
     guidelines: [String],
     members: [String],
