@@ -9,7 +9,7 @@ const morgan = require('morgan');
 const cors = require('cors');
 const compression = require('compression');
 const {
-  users, spaces, confessions, pops,
+  users, spaces, confessions,
 } = require('./models');
 
 const app = express();
@@ -181,14 +181,14 @@ app.patch('/confessions/:confession_id/:comment_id/report/:username', (req, res)
 
 // ENDPT #9
 app.patch('/confessions/:confession_id/:comment_id/pop/:username', (req, res) => {
-  pops.popPlopComment(req.params.confession_id, req.params.comment_id, req.params.username, true)
+  confessions.popPlop(req.params.confession_id, req.params.comment_id, req.params.username, true)
     .then(() => res.status(204).send('NO CONTENT'))
     .catch((err) => res.status(400).send(err));
 });
 
 // ENDPT #10
 app.patch('/confessions/:confession_id/:comment_id/plop/:username', (req, res) => {
-  pops.popPlopComment(req.params.confession_id, req.params.comment_id, req.params.username, false)
+  confessions.popPlop(req.params.confession_id, req.params.comment_id, req.params.username, false)
     .then(() => res.status(204).send('NO CONTENT'))
     .catch((err) => res.status(400).send(err));
 });

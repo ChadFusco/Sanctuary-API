@@ -83,16 +83,17 @@ confessions.createComment = async (body, callback) => {
     .catch((err) => callback(err));
 };
 
-confessions.popPlopComment = async (confessionID, commentID, delta, callback) => {
-  const foundConfession = await confessions.readConfession(confessionID);
-  const foundCommentIdx = foundConfession.comments.reduce((acc, val, i) => (
-    val.comment_id === parseInt(commentID, 10) ? i : acc
-  ), 0);
-  foundConfession.comments[foundCommentIdx].pops += delta;
-  foundConfession.save()
-    .then(() => callback())
-    .catch((err) => callback(err));
-};
+confessions.popPlop = async (confessionID, commentID, popperUsername, delta) => (
+  confessions.readConfession(confessionID)
+    .then((confession) => {
+      const foundCommentIdx = confession.comments.reduce((acc, val, i) => (
+        val.comment_id === parseInt(commentID, 10) ? i : acc
+      ), 0);
+      // foundConfession.comments[foundCommentIdx].pops += delta;
+      confession.comments[foundCommentIdx].find()
+    })
+    .then((confession) => confession.save())
+);
 
 confessions.reportConfession = async (confessionID, reportingUsername, callback) => {
   let reportedConfession;

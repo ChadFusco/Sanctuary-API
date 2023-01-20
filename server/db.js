@@ -41,12 +41,22 @@ const spacesSchema = new mongoose.Schema(
 
 exports.Spaces = mongoose.model('Spaces', spacesSchema);
 
+const popsSchema = new mongoose.Schema(
+  {
+    username: { type: String, required: true, index: true },
+    pop_plop: { type: Boolean, required: true, index: true },
+  },
+);
+
+exports.Pops = mongoose.model('Pops', popsSchema);
+
 const commentsSchema = new mongoose.Schema(
   {
     created_by: { type: String, required: true },
     comment: { type: String, required: true },
     reported: [String],
     pops: { type: Number, default: 1 },
+    pop_plop: [popsSchema],
   },
   { timestamps: true },
 );
@@ -66,13 +76,3 @@ const confessionsSchema = new mongoose.Schema(
 confessionsSchema.plugin(AutoIncrement, { inc_field: 'confession_id' });
 
 exports.Confessions = mongoose.model('Confessions', confessionsSchema);
-
-const popsSchema = new mongoose.Schema(
-  {
-    conf_comment_id: { type: String, required: true, index: true },
-    username: { type: String, required: true },
-    pop_plop: { type: Boolean, required: true, index: true },
-  },
-);
-
-exports.Pops = mongoose.model('Pops', popsSchema);
