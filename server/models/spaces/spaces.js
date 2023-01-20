@@ -32,7 +32,8 @@ spaces.update = (space_name, changes, callback) => {
 spaces.read = (space_name, callback, page = 1, count = 4) => {
   const spaceNameRegex = space_name ? new RegExp(space_name, 'i') : /./;
   const skip = (page - 1) * count;
-  Spaces.find({ space_name: spaceNameRegex }, null, { skip, limit: count }, callback);
+  const limit = parseInt(count, 10);
+  Spaces.find({ space_name: spaceNameRegex }, null, { skip, limit }, callback);
 };
 
 // spaces.addMember = async (spaceName, username, callback) => {
