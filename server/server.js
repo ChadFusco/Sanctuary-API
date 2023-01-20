@@ -9,7 +9,7 @@ const morgan = require('morgan');
 const cors = require('cors');
 const compression = require('compression');
 const {
-  users, spaces, confessions,
+  users, spaces, confessions, pops,
 } = require('./models');
 
 const app = express();
@@ -180,25 +180,17 @@ app.patch('/confessions/:confession_id/:comment_id/report/:username', (req, res)
 });
 
 // ENDPT #9
-app.patch('/confessions/:confession_id/:comment_id/pop', (req, res) => {
-  confessions.popPlopComment(req.params.confession_id, req.params.comment_id, 1, (err) => {
-    if (err) {
-      res.status(400).send(err);
-    } else {
-      res.status(204).send('NO CONTENT');
-    }
-  });
+app.patch('/confessions/:confession_id/:comment_id/pop/:username', (req, res) => {
+  pops.popPlopComment(req.params.confession_id, req.params.comment_id, req.params.username, true)
+    .then(() => res.status(204).send('NO CONTENT'))
+    .catch((err) => res.status(400).send(err));
 });
 
 // ENDPT #10
-app.patch('/confessions/:confession_id/:comment_id/plop', (req, res) => {
-  confessions.popPlopComment(req.params.confession_id, req.params.comment_id, -1, (err) => {
-    if (err) {
-      res.status(400).send(err);
-    } else {
-      res.status(204).send('NO CONTENT');
-    }
-  });
+app.patch('/confessions/:confession_id/:comment_id/plop/:username', (req, res) => {
+  pops.popPlopComment(req.params.confession_id, req.params.comment_id, req.params.username, false)
+    .then(() => res.status(204).send('NO CONTENT'))
+    .catch((err) => res.status(400).send(err));
 });
 
 // ENDPT #11
@@ -213,23 +205,12 @@ app.patch('/spaces/:space_name/:username/add', (req, res) => {
 });
 
 // ENDPT #12
-// app.patch('/spaces/:space_name/:username/remove', (req, res) => {
-//   console.log('req.params:', req.params);
-//   users.removeSpacesJoined(req.params, (err) => {
-//     if (err) {
-//       res.status(400).send(err);
-//     } else {
-//       res.status(204).send('NO CONTENT');
-//     }
-//   });
-// });
 app.patch('/spaces/:space_name/:username/remove', (req, res) => {
   console.log('req.params:', req.params);
   users.removeSpacesJoined(req.params)
     .then(() => res.status(204).send('NO CONTENT'))
     .catch((err) => res.status(400).send(err));
 });
-// conf ? 200 : 404
 
 // ENDPT #13
 app.patch('/spaces/:space_name/:username/ban', (req, res) => {

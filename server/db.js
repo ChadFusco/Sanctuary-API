@@ -69,8 +69,9 @@ exports.Confessions = mongoose.model('Confessions', confessionsSchema);
 
 const popsSchema = new mongoose.Schema(
   {
-    username: { type: String, required: true, unique: true },
-    pop_plop: { type: Boolean, required: true, unique: true },
+    conf_comment_id: { type: String, required: true, index: true },
+    username: { type: String, required: true },
+    pop_plop: { type: Boolean, required: true, index: true },
   },
 );
 

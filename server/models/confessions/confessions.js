@@ -63,12 +63,6 @@ confessions.findConfession = async (spaceName, username, spaceCreator, page = 1,
     .skip(skip).limit(count);
 };
 
-confessions.findComment = async (confession, commentID) => (
-  confession.comments.reduce((acc, val) => (
-    val.comment_id === commentID ? val : acc
-  ))
-);
-
 confessions.create = (body, callback) => {
   Confessions.create({
     created_by: body.created_by,
