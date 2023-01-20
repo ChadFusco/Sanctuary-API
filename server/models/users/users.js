@@ -96,9 +96,8 @@ users.updateReports = async (username, spaceName) => {
     });
 };
 
-users.ban = async ({ space_name, username }) => {
-  console.log('banning in progress for username:', username);
-  return Users.findOneAndUpdate({ username }, { $push: { banned: space_name } });
-};
+users.ban = async ({ space_name, username }) => (
+  Users.findOneAndUpdate({ username }, { $push: { banned: space_name } })
+);
 
 module.exports = users;
