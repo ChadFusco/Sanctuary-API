@@ -222,6 +222,7 @@ app.patch('/spaces/:space_name/:username/remove', (req, res) => {
     }
   });
 });
+// conf ? 200 : 404
 
 // ENDPT #13
 app.patch('/spaces/:space_name/:username/ban', (req, res) => {
