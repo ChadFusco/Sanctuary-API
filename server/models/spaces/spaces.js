@@ -60,7 +60,6 @@ spaces.addMember = async (spaceName, username, callback) => {
 
 spaces.removeMember = async (spaceName, username) => {
   const foundSpace = await Spaces.findOne({ space_name: spaceName });
-  foundSpace.members.push(username);
   foundSpace.members = foundSpace.members.filter((member) => member !== username);
   return foundSpace.save();
 };

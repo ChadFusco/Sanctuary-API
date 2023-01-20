@@ -213,14 +213,21 @@ app.patch('/spaces/:space_name/:username/add', (req, res) => {
 });
 
 // ENDPT #12
+// app.patch('/spaces/:space_name/:username/remove', (req, res) => {
+//   console.log('req.params:', req.params);
+//   users.removeSpacesJoined(req.params, (err) => {
+//     if (err) {
+//       res.status(400).send(err);
+//     } else {
+//       res.status(204).send('NO CONTENT');
+//     }
+//   });
+// });
 app.patch('/spaces/:space_name/:username/remove', (req, res) => {
-  users.removeSpacesJoined(req.params, (err) => {
-    if (err) {
-      res.status(400).send(err);
-    } else {
-      res.status(204).send('NO CONTENT');
-    }
-  });
+  console.log('req.params:', req.params);
+  users.removeSpacesJoined(req.params)
+    .then(() => res.status(204).send('NO CONTENT'))
+    .catch((err) => res.status(400).send(err));
 });
 // conf ? 200 : 404
 
