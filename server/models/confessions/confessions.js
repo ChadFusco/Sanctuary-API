@@ -12,6 +12,7 @@ confessions.findConfession = async (spaceName, username, spaceCreator, page = 1,
   const spaceNameRegex = spaceName ? new RegExp(spaceName, 'i') : /./;
   const usernameRegex = username ? new RegExp(username, 'i') : /./;
   const skip = (page - 1) * count;
+  const limit = parseInt(count, 10);
   const spaceCreatorRegex = spaceCreator ? new RegExp(spaceCreator, 'i') : /./;
   return Confessions
     .aggregate([
@@ -46,38 +47,8 @@ confessions.findConfession = async (spaceName, username, spaceCreator, page = 1,
           space: 0,
         },
       },
-      // {
-      //   $unwind: '$comments',
-      // },
-      // {
-      //   $addFields: {
-      //     'comments.sum_plops_list': {
-      //       $size: {
-      //         $map: {
-      //           input: { $objectToArray: '$comments.plops_list' },
-      //           in: '$$this.k'
-      //         }
-      //       }
-      //     }
-      //   }
-      // },
-      // {
-      //   $group: {
-      //     _id: '$_id',
-      //     created_by: { $first: '$created_by' },
-      //     confession: { $first: '$confession' },
-      //     reported: { $first: '$reported' },
-      //     space_name: { $first: '$space_name' },
-      //     hugs: { $first: '$hugs' },
-      //     comments: { $push: '$comments' },
-      //     createdAt: { $first: '$createdAt' },
-      //     updatedAt: { $first: '$updatedAt' },
-      //     confession_id: { $first: '$confession_id' },
-      //     space_creator: { $first: '$space_creator' },
-      //   },
-      // },
     ])
-    .skip(skip).limit(count);
+    .skip(skip).limit(limit);
 };
 
 confessions.create = (body, callback) => {
