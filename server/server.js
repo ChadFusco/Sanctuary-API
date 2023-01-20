@@ -222,7 +222,6 @@ app.patch('/spaces/:space_name/:username/add', (req, res) => {
 
 // ENDPT #12
 app.patch('/spaces/:space_name/:username/remove', (req, res) => {
-  console.log('req.params:', req.params);
   users.removeSpacesJoined(req.params)
     .then(() => res.status(204).send('NO CONTENT'))
     .catch((err) => res.status(400).send(err));
