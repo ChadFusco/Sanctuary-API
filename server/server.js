@@ -74,8 +74,7 @@ app.get('/confessions', (req, res) => {
       let filteredConfessions = foundConfessions;
       if (reported !== undefined) {
         filteredConfessions = filteredConfessions.map((confession) => {
-          let filteredConfession = { ...confession };
-          filteredConfession = filteredConfession._doc;
+          const filteredConfession = { ...confession };
           const filteredComments = filteredConfession.comments.filter((comment) => (
             (reported === 'true' ? (comment.reported.length > 0) : (comment.reported.length === 0))
           ));
