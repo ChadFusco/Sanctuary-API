@@ -159,7 +159,7 @@ confessions.reportComment = async (confessionID, commentID, reportingUsername, c
     .then((confession) => {
       reportedConfession = confession;
       const commentIdx = confession.comments.reduce((acc, val, i) => (
-        val.comment_id === commentID ? i : acc
+        val.comment_id === parseInt(commentID, 10) ? i : acc
       ), 0);
       if (!confession.comments[commentIdx].reported.some((item) => item === reportingUsername)) {
         confession.comments[commentIdx].reported.push(reportingUsername);
