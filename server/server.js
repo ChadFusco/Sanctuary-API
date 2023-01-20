@@ -12,6 +12,21 @@ const {
   users, spaces, confessions,
 } = require('./models');
 
+// HELPER FUNCTIONS
+
+const changePopsPlopsListToInt = (conf) => {
+  const filteredConfession = { ...conf };
+  const commentsWithPops = filteredConfession.comments.map((comment) => {
+    const newComment = { ...comment };
+    const pops = Object.keys(newComment.pops_list || {}).length
+      - Object.keys(newComment.plops_list || {}).length;
+    delete newComment.plops_list;
+    delete newComment.pops_list;
+    return { ...newComment, pops };
+  });
+  return { ...filteredConfession, comments: commentsWithPops };
+};
+
 const app = express();
 
 // APP-WIDE MIDDLEWARE
@@ -86,6 +101,10 @@ app.get('/confessions', (req, res) => {
           return filter;
         });
       }
+      // convert plops_list and pops_list to pops
+      filteredConfessions = filteredConfessions.map((confession) => (
+        changePopsPlopsListToInt(confession)
+      ));
       res.status(200).send(filteredConfessions);
     })
     .catch((err) => res.status(400).send(err));
@@ -94,6 +113,7 @@ app.get('/confessions', (req, res) => {
 // ENDPT #19
 app.get('/confessions/:confession_id', (req, res) => {
   confessions.readConfession(req.params.confession_id)
+    .then((conf) => changePopsPlopsListToInt(conf.toObject()))
     .then((conf) => res.status(conf ? 200 : 404).send(conf))
     .catch((err) => res.status(400).send(err));
 });

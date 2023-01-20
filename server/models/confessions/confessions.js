@@ -8,17 +8,47 @@ confessions.readConfession = async (confessionID) => (
   Confessions.findOne({ confession_id: confessionID })
 );
 
-// confessions.findConfession = async (spaceName, username, page = 1, count = 4) => {
+// confessions.findConfession = async (spaceName, username, spaceCreator, page = 1, count = 4) => {
 //   const spaceNameRegex = spaceName ? new RegExp(spaceName, 'i') : /./;
 //   const usernameRegex = username ? new RegExp(username, 'i') : /./;
 //   const skip = (page - 1) * count;
-//   const query = { space_name: spaceNameRegex, created_by: usernameRegex };
-//   // if (reported === 'true') {
-//   //   query.reported = { $not: { $size: 0 } };
-//   // } else if (reported === 'false') {
-//   //   query.reported = { $size: 0 };
-//   // }
-//   return Confessions.find(query, null, { skip, limit: count });
+//   const spaceCreatorRegex = spaceCreator ? new RegExp(spaceCreator, 'i') : /./;
+//   return Confessions
+//     .aggregate([
+//       { $match: { space_name: spaceNameRegex, created_by: usernameRegex } },
+//       {
+//         $lookup: {
+//           from: 'spaces', localField: 'space_name', foreignField: 'space_name', as: 'space',
+//         },
+//       },
+//       {
+//         $project: {
+//           space: { $arrayElemAt: ['$space', 0] },
+//           created_by: 1,
+//           confession: 1,
+//           reported: 1,
+//           space_name: 1,
+//           hugs: 1,
+//           comments: 1,
+//           createdAt: 1,
+//           updatedAt: 1,
+//           confession_id: 1,
+//           plops_list: 1,
+//         },
+//       },
+//       { $match: { 'space.created_by': spaceCreatorRegex } },
+//       {
+//         $addFields: {
+//           space_creator: '$space.created_by',
+//         },
+//       },
+//       {
+//         $project: {
+//           space: 0,
+//         },
+//       },
+//     ])
+//     .skip(skip).limit(count);
 // };
 
 confessions.findConfession = async (spaceName, username, spaceCreator, page = 1, count = 4) => {
@@ -59,6 +89,36 @@ confessions.findConfession = async (spaceName, username, spaceCreator, page = 1,
           space: 0,
         },
       },
+      // {
+      //   $unwind: '$comments',
+      // },
+      // {
+      //   $addFields: {
+      //     'comments.sum_plops_list': {
+      //       $size: {
+      //         $map: {
+      //           input: { $objectToArray: '$comments.plops_list' },
+      //           in: '$$this.k'
+      //         }
+      //       }
+      //     }
+      //   }
+      // },
+      // {
+      //   $group: {
+      //     _id: '$_id',
+      //     created_by: { $first: '$created_by' },
+      //     confession: { $first: '$confession' },
+      //     reported: { $first: '$reported' },
+      //     space_name: { $first: '$space_name' },
+      //     hugs: { $first: '$hugs' },
+      //     comments: { $push: '$comments' },
+      //     createdAt: { $first: '$createdAt' },
+      //     updatedAt: { $first: '$updatedAt' },
+      //     confession_id: { $first: '$confession_id' },
+      //     space_creator: { $first: '$space_creator' },
+      //   },
+      // },
     ])
     .skip(skip).limit(count);
 };
@@ -83,21 +143,38 @@ confessions.createComment = async (body, callback) => {
     .catch((err) => callback(err));
 };
 
-confessions.popPlop = async (confessionID, commentID, popperUsername, pop_plop) => (
+confessions.popPlop = async (confessionID, commentID, popperUsername, popPlop) => (
   confessions.readConfession(confessionID)
     .then((confession) => {
-      const foundCommentIdx = confession.comments.reduce((acc, val, i) => (
+      const foundConf = confession;
+      const foundCommentIdx = foundConf.comments.reduce((acc, val, i) => (
         val.comment_id === parseInt(commentID, 10) ? i : acc
       ), 0);
-      // foundConfession.comments[foundCommentIdx].pops += delta;
-      confession.comments[foundCommentIdx].findOneAndUpdate(
-        { username: popperUsername },
-        { pop_plop },
-        { upsert: true },
-      );
+      if (popPlop) {
+        foundConf.comments[foundCommentIdx].pops_list[popperUsername] = true;
+        delete foundConf.comments[foundCommentIdx].plops_list[popperUsername];
+      } else {
+        foundConf.comments[foundCommentIdx].plops_list[popperUsername] = true;
+        delete foundConf.comments[foundCommentIdx].pops_list[popperUsername];
+      }
+      return foundConf;
     })
-    .then((confession) => confession.save())
+    .then((confession) => {
+      confession.markModified('comments');
+      return confession.save();
+    })
 );
+
+// confessions.popPlopComment = async (confessionID, commentID, delta, callback) => {
+//   const foundConfession = await confessions.readConfession(confessionID);
+//   const foundCommentIdx = foundConfession.comments.reduce((acc, val, i) => (
+//     val.comment_id === parseInt(commentID, 10) ? i : acc
+//   ), 0);
+//   foundConfession.comments[foundCommentIdx].pops += delta;
+//   foundConfession.save()
+//     .then(() => callback())
+//     .catch((err) => callback(err));
+// };
 
 confessions.reportConfession = async (confessionID, reportingUsername, callback) => {
   let reportedConfession;

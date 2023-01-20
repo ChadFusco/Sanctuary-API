@@ -55,8 +55,11 @@ const commentsSchema = new mongoose.Schema(
     created_by: { type: String, required: true },
     comment: { type: String, required: true },
     reported: [String],
-    pops: { type: Number, default: 1 },
-    pop_plop: [popsSchema],
+    pops_list: { type: Object, default: { } },
+    plops_list: { type: Object, default: { } },
+    // plops: {
+    //   username: { type: Boolean, default: false },
+    // },
   },
   { timestamps: true },
 );
