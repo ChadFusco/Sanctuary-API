@@ -47,6 +47,35 @@ confessions.findConfession = async (spaceName, username, spaceCreator, page = 1,
           space: 0,
         },
       },
+      {
+        $lookup: {
+          from: 'users', localField: 'created_by', foreignField: 'username', as: 'user',
+        },
+      },
+      {
+        $project: {
+          user: { $arrayElemAt: ['$user', 0] },
+          created_by: 1,
+          confession: 1,
+          reported: 1,
+          space_name: 1,
+          hugs: 1,
+          comments: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          confession_id: 1,
+        },
+      },
+      {
+        $addFields: {
+          conf_creator_avatar: '$user.avatar',
+        },
+      },
+      {
+        $project: {
+          user: 0,
+        },
+      },
     ])
     .skip(skip).limit(limit);
 };
