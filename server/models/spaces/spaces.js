@@ -35,17 +35,6 @@ spaces.read = (space_name, callback, page = 1, count = 4) => {
   Spaces.find({ space_name: spaceNameRegex }, null, { skip, limit: count }, callback);
 };
 
-// spaces.addMember = async (spaceName, username, callback) => {
-//   const foundSpace = await Spaces.findOne({ space_name: spaceName });
-//   console.log('foundSpace:', foundSpace);
-//   if (!foundSpace.members.some((item) => item === username)) {
-//     foundSpace.members.push(username);
-//   }
-//   await foundSpace.save()
-//     .then(() => callback())
-//     .catch((err) => callback(err));
-// };
-
 spaces.addMember = async (spaceName, username, callback) => {
   Spaces.findOne({ space_name: spaceName })
     .then((foundSpace) => {

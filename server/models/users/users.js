@@ -11,13 +11,9 @@ users.create = (body, callback) => {
   }, callback);
 };
 
-// eslint-disable-next-line consistent-return
-users.readOne = (username, callback) => {
-  if (!callback) {
-    return Users.findOne({ username });
-  }
-  Users.findOne({ username }, callback);
-};
+users.readOne = (username) => (
+  Users.findOne({ username })
+);
 
 users.updateSpacesCreated = async (spaceName, username, callback) => {
   const foundUser = await Users.findOne({ username });
