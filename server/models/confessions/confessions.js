@@ -83,14 +83,18 @@ confessions.createComment = async (body, callback) => {
     .catch((err) => callback(err));
 };
 
-confessions.popPlop = async (confessionID, commentID, popperUsername, delta) => (
+confessions.popPlop = async (confessionID, commentID, popperUsername, pop_plop) => (
   confessions.readConfession(confessionID)
     .then((confession) => {
       const foundCommentIdx = confession.comments.reduce((acc, val, i) => (
         val.comment_id === parseInt(commentID, 10) ? i : acc
       ), 0);
       // foundConfession.comments[foundCommentIdx].pops += delta;
-      confession.comments[foundCommentIdx].find()
+      confession.comments[foundCommentIdx].findOneAndUpdate(
+        { username: popperUsername },
+        { pop_plop },
+        { upsert: true },
+      );
     })
     .then((confession) => confession.save())
 );
