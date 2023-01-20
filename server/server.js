@@ -54,13 +54,9 @@ app.get('/', (req, res) => {
 
 // ENDPT #1
 app.get('/users/:username', (req, res) => {
-  users.readOne(req.params.username, (err, user) => {
-    if (err) {
-      res.status(400).send(err);
-    } else {
-      res.status(200).send(user);
-    }
-  });
+  users.readOne(req.params.username)
+    .then((user) => res.status(user ? 200 : 204).send(user))
+    .catch((err) => res.status(400).send(err));
 });
 
 // ENDPT #2
