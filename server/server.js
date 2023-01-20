@@ -74,8 +74,7 @@ app.get('/confessions', (req, res) => {
       let filteredConfessions = foundConfessions;
       if (reported !== undefined) {
         filteredConfessions = filteredConfessions.map((confession) => {
-          let filteredConfession = { ...confession };
-          filteredConfession = filteredConfession._doc;
+          const filteredConfession = { ...confession };
           const filteredComments = filteredConfession.comments.filter((comment) => (
             (reported === 'true' ? (comment.reported.length > 0) : (comment.reported.length === 0))
           ));
@@ -95,7 +94,7 @@ app.get('/confessions', (req, res) => {
 // ENDPT #19
 app.get('/confessions/:confession_id', (req, res) => {
   confessions.readConfession(req.params.confession_id)
-    .then((confession) => res.status(200).send(confession))
+    .then((conf) => res.status(conf ? 200 : 404).send(conf))
     .catch((err) => res.status(400).send(err));
 });
 
@@ -214,15 +213,23 @@ app.patch('/spaces/:space_name/:username/add', (req, res) => {
 });
 
 // ENDPT #12
+// app.patch('/spaces/:space_name/:username/remove', (req, res) => {
+//   console.log('req.params:', req.params);
+//   users.removeSpacesJoined(req.params, (err) => {
+//     if (err) {
+//       res.status(400).send(err);
+//     } else {
+//       res.status(204).send('NO CONTENT');
+//     }
+//   });
+// });
 app.patch('/spaces/:space_name/:username/remove', (req, res) => {
-  users.removeSpacesJoined(req.params, (err) => {
-    if (err) {
-      res.status(400).send(err);
-    } else {
-      res.status(204).send('NO CONTENT');
-    }
-  });
+  console.log('req.params:', req.params);
+  users.removeSpacesJoined(req.params)
+    .then(() => res.status(204).send('NO CONTENT'))
+    .catch((err) => res.status(400).send(err));
 });
+// conf ? 200 : 404
 
 // ENDPT #13
 app.patch('/spaces/:space_name/:username/ban', (req, res) => {

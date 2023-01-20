@@ -32,7 +32,7 @@ users.addSpacesJoined = async (spaceName, username, callback) => {
   const foundUser = await Users.findOne({ username });
   if (foundUser.banned.some((item) => item === username)) {
     callback(new Error('User is banned from this space!'));
-  } else {
+  } else if (!foundUser.spaces_joined.some((item) => item === spaceName)) {
     foundUser.spaces_joined.push(spaceName);
     spaces.addMember(spaceName, username, (err) => {
       if (err) {
@@ -42,6 +42,8 @@ users.addSpacesJoined = async (spaceName, username, callback) => {
         callback();
       }
     });
+  } else {
+    callback(new Error('user is already a member'));
   }
 };
 
