@@ -66,3 +66,12 @@ const confessionsSchema = new mongoose.Schema(
 confessionsSchema.plugin(AutoIncrement, { inc_field: 'confession_id' });
 
 exports.Confessions = mongoose.model('Confessions', confessionsSchema);
+
+const popsSchema = new mongoose.Schema(
+  {
+    username: { type: String, required: true, unique: true },
+    pop_plop: { type: Boolean, required: true, unique: true },
+  },
+);
+
+exports.Pops = mongoose.model('Pops', popsSchema);
