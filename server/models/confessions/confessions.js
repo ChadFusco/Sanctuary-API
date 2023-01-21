@@ -4,6 +4,35 @@ const users = require('../users/users');
 
 const confessions = {};
 
+// HELPER FUNCTIONS
+
+confessions.getConfSpaceCreator = (confessionID) => (
+  Confessions
+    .aggregate([
+      { $match: { confession_id: confessionID } },
+      {
+        $lookup: {
+          from: 'spaces', localField: 'space_name', foreignField: 'space_name', as: 'space',
+        },
+      },
+      {
+        $project: {
+          space: { $arrayElemAt: ['$space', 0] },
+        },
+      },
+      {
+        $addFields: {
+          space_creator: '$space.created_by',
+        },
+      },
+      {
+        $project: {
+          space_creator: 1,
+        },
+      },
+    ])
+);
+
 confessions.readConfession = async (confessionID) => (
   Confessions.findOne({ confession_id: confessionID })
 );
@@ -38,6 +67,7 @@ confessions.findConfession = async (spaceName, username, spaceCreator, page = 1,
           createdAt: 1,
           updatedAt: 1,
           confession_id: 1,
+          reported_read: 1,
         },
       },
       { $match: { 'space.created_by': spaceCreatorFilter } },
@@ -59,6 +89,7 @@ confessions.findConfession = async (spaceName, username, spaceCreator, page = 1,
           createdAt: 1,
           updatedAt: 1,
           confession_id: 1,
+          reported_read: 1,
         },
       },
       {
@@ -173,8 +204,30 @@ confessions.reportComment = async (confessionID, commentID, reportingUsername, c
     .catch((err) => callback(err));
 };
 
+confessions.commentReportedRead = async (confessionID, commentID) => {
+  let readConfession;
+  return confessions.readConfession(confessionID)
+    .then((confession) => {
+      readConfession = confession;
+      const commentIdx = confession.comments.reduce((acc, val, i) => (
+        val.comment_id === parseInt(commentID, 10) ? i : acc
+      ), 0);
+      readConfession.comments[commentIdx].reported_read = true;
+      return readConfession;
+    })
+    .then(() => (confessions.getConfSpaceCreator(confessionID)))
+    .then((confs) => (users.reportedRead(confs[0].space_creator)))
+    .then(() => readConfession.save());
+};
+
 confessions.addHug = ({ confession_id }) => (
   Confessions.findOneAndUpdate({ confession_id }, { $inc: { hugs: 1 } })
+);
+
+confessions.reportedRead = (confessionID) => (
+  Confessions.findOneAndUpdate({ confessionID }, { reported_read: true })
+    .then(() => (confessions.getConfSpaceCreator(confessionID)))
+    .then((confs) => (users.reportedRead(confs[0].space_creator)))
 );
 
 confessions.deleteConfession = ({ confession_id }, callback) => {

@@ -242,11 +242,28 @@ app.patch('/confessions/:confession_id/hug', (req, res) => {
 });
 
 // ENDPT #20
-app.patch('/users/:username/:reported_read', (req, res) => {
-  users.reportedRead(req.params)
+app.patch('/confessions/:confession_id/:comment_id/reported_read', (req, res) => {
+  const confessionID = parseInt(req.params.confession_id, 10);
+  const commentID = parseInt(req.params.confession_id, 10);
+  confessions.commentReportedRead(confessionID, commentID)
     .then(() => res.status(204).send('NO CONTENT'))
     .catch((err) => res.status(400).send(err));
 });
+
+// ENDPT #21
+app.patch('/confessions/:confession_id/reported_read', (req, res) => {
+  const confessionID = parseInt(req.params.confession_id, 10);
+  confessions.reportedRead(confessionID)
+    .then(() => res.status(204).send('NO CONTENT'))
+    .catch((err) => res.status(400).send(err));
+});
+
+// // ENDPT #22
+// app.patch('/users/:username/:reported_read', (req, res) => {
+//   users.reportedRead(req.params.username)
+//     .then(() => res.status(204).send('NO CONTENT'))
+//     .catch((err) => res.status(400).send(err));
+// });
 
 // ----------------------------------------
 // DELETE ROUTES --------------------------
