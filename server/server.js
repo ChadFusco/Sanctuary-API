@@ -141,13 +141,9 @@ app.post('/spaces', (req, res) => {
 
 // ENDPT #4
 app.post('/confessions', (req, res) => {
-  confessions.create(req.body, (err) => {
-    if (err) {
-      res.status(400).send(err);
-    } else {
-      res.status(201).send('CREATED');
-    }
-  });
+  confessions.create(req.body)
+    .then(() => res.status(201).send('CREATED'))
+    .catch((err) => res.status(400).send(err));
 });
 
 // ENDPT #5

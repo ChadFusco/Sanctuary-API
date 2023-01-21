@@ -77,13 +77,13 @@ confessions.findConfession = async (spaceName, username, spaceCreator, page = 1,
     .skip(skip).limit(limit);
 };
 
-confessions.create = (body, callback) => {
+confessions.create = (body) => (
   Confessions.create({
     created_by: body.created_by,
     confession: body.confession,
     space_name: body.space_name,
-  }, callback);
-};
+  })
+);
 
 confessions.createComment = async (body) => {
   const foundConfession = await confessions.readConfession(body.confession_id);
