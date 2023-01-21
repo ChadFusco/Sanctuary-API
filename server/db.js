@@ -58,6 +58,7 @@ const commentsSchema = new mongoose.Schema(
     reported: [String],
     pops_list: { type: Object, default: { } },
     plops_list: { type: Object, default: { } },
+    reported_read: { type: Boolean, default: false },
   },
   { timestamps: true },
 );
@@ -70,6 +71,7 @@ const confessionsSchema = new mongoose.Schema(
     reported: [String],
     space_name: { type: String, required: true, index: true },
     hugs: { type: Number, default: 0, min: 0 },
+    reported_read: { type: Boolean, default: false },
     comments: [commentsSchema],
   },
   { timestamps: true },
