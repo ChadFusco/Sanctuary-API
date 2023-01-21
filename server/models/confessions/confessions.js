@@ -178,8 +178,8 @@ confessions.reportComment = async (confessionID, commentID, reportingUsername, c
     .catch((err) => callback(err));
 };
 
-confessions.addHug = ({ confession_id }, callback) => {
-  Confessions.findOneAndUpdate({ confession_id }, { $inc: { hugs: 1 } }, callback);
+confessions.addHug = ({ confession_id }) => {
+  Confessions.findOneAndUpdate({ confession_id }, { $inc: { hugs: 1 } });
 };
 
 confessions.deleteConfession = ({ confession_id }, callback) => {

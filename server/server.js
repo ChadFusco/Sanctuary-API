@@ -255,6 +255,13 @@ app.patch('/spaces/:space_name', (req, res) => {
 
 // ENDPT #18
 app.patch('/confessions/:confession_id/hug', (req, res) => {
+  confessions.addHug(req.params)
+    .then(() => res.status(204).send('NO CONTENT'))
+    .catch((err) => res.status(400).send(err));
+});
+
+// ENDPT #20
+app.patch('/confessions/:confession_id/hug', (req, res) => {
   confessions.addHug(req.params, (err) => {
     if (err) {
       res.status(400).send(err);
