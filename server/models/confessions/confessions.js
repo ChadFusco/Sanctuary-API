@@ -85,16 +85,14 @@ confessions.create = (body, callback) => {
   }, callback);
 };
 
-confessions.createComment = async (body, callback) => {
+confessions.createComment = async (body) => {
   const foundConfession = await confessions.readConfession(body.confession_id);
   const newComment = {
     created_by: body.created_by,
     comment: body.comment,
   };
   foundConfession.comments.push(newComment);
-  await foundConfession.save()
-    .then(() => callback())
-    .catch((err) => callback(err));
+  return foundConfession.save();
 };
 
 confessions.popPlop = async (confessionID, commentID, popperUsername, popPlop) => (

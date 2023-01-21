@@ -152,13 +152,9 @@ app.post('/confessions', (req, res) => {
 
 // ENDPT #5
 app.post('/comments', (req, res) => {
-  confessions.createComment(req.body, (err) => {
-    if (err) {
-      res.status(400).send(err);
-    } else {
-      res.status(201).send('CREATED');
-    }
-  });
+  confessions.createComment(req.body)
+    .then(() => res.status(201).send('CREATED'))
+    .catch((err) => res.status(400).send(err));
 });
 
 // ----------------------------------------
