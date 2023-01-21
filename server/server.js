@@ -237,13 +237,9 @@ app.patch('/spaces/:space_name/:username/ban', (req, res) => {
 
 // ENDPT #17
 app.patch('/spaces/:space_name', (req, res) => {
-  spaces.update(req.params.space_name, req.body, (err) => {
-    if (err) {
-      res.status(400).send(err);
-    } else {
-      res.status(204).send('NO CONTENT');
-    }
-  });
+  spaces.update(req.params.space_name, req.body)
+    .then(() => res.status(204).send('NO CONTENT'))
+    .catch((err) => res.status(400).send(err));
 });
 
 // ENDPT #18
