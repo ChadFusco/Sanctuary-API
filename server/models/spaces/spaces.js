@@ -29,11 +29,12 @@ spaces.update = (space_name, changes, callback) => {
   Spaces.findOneAndUpdate({ space_name }, spaceUpdates, callback);
 };
 
-spaces.read = (space_name, callback, page = 1, count = 4) => {
+spaces.read = async (space_name, page = 1, count = 4, exact = false) => {
   const spaceNameRegex = space_name ? new RegExp(space_name, 'i') : /./;
+  const spaceNameFilter = (exact && space_name) ? space_name : spaceNameRegex;
   const skip = (page - 1) * count;
   const limit = parseInt(count, 10);
-  Spaces.find({ space_name: spaceNameRegex }, null, { skip, limit }, callback);
+  return Spaces.find({ space_name: spaceNameFilter }, null, { skip, limit });
 };
 
 spaces.addMember = async (spaceName, username, callback) => {
