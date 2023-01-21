@@ -61,18 +61,9 @@ app.get('/users/:username', (req, res) => {
 
 // ENDPT #2
 app.get('/spaces', (req, res) => {
-  spaces.read(
-    req.query.space_name,
-    (err, space) => {
-      if (err) {
-        res.status(400).send(err);
-      } else {
-        res.status(200).send(space);
-      }
-    },
-    req.query.page,
-    req.query.count,
-  );
+  spaces.read(req.query.space_name, req.query.page, req.query.count, req.query.exact)
+    .then((space) => res.status(space ? 200 : 204).send(space))
+    .catch((err) => res.status(400).send(err));
 });
 
 // ENDPT #3
