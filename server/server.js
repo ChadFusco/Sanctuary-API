@@ -141,24 +141,16 @@ app.post('/spaces', (req, res) => {
 
 // ENDPT #4
 app.post('/confessions', (req, res) => {
-  confessions.create(req.body, (err) => {
-    if (err) {
-      res.status(400).send(err);
-    } else {
-      res.status(201).send('CREATED');
-    }
-  });
+  confessions.create(req.body)
+    .then(() => res.status(201).send('CREATED'))
+    .catch((err) => res.status(400).send(err));
 });
 
 // ENDPT #5
 app.post('/comments', (req, res) => {
-  confessions.createComment(req.body, (err) => {
-    if (err) {
-      res.status(400).send(err);
-    } else {
-      res.status(201).send('CREATED');
-    }
-  });
+  confessions.createComment(req.body)
+    .then(() => res.status(201).send('CREATED'))
+    .catch((err) => res.status(400).send(err));
 });
 
 // ----------------------------------------
@@ -237,25 +229,41 @@ app.patch('/spaces/:space_name/:username/ban', (req, res) => {
 
 // ENDPT #17
 app.patch('/spaces/:space_name', (req, res) => {
-  spaces.update(req.params.space_name, req.body, (err) => {
-    if (err) {
-      res.status(400).send(err);
-    } else {
-      res.status(204).send('NO CONTENT');
-    }
-  });
+  spaces.update(req.params.space_name, req.body)
+    .then(() => res.status(204).send('NO CONTENT'))
+    .catch((err) => res.status(400).send(err));
 });
 
 // ENDPT #18
 app.patch('/confessions/:confession_id/hug', (req, res) => {
-  confessions.addHug(req.params, (err) => {
-    if (err) {
-      res.status(400).send(err);
-    } else {
-      res.status(204).send('NO CONTENT');
-    }
-  });
+  confessions.addHug(req.params)
+    .then(() => res.status(204).send('NO CONTENT'))
+    .catch((err) => res.status(400).send(err));
 });
+
+// ENDPT #20
+app.patch('/confessions/:confession_id/:comment_id/reported_read', (req, res) => {
+  const confessionID = parseInt(req.params.confession_id, 10);
+  const commentID = parseInt(req.params.confession_id, 10);
+  confessions.commentReportedRead(confessionID, commentID)
+    .then(() => res.status(204).send('NO CONTENT'))
+    .catch((err) => res.status(400).send(err));
+});
+
+// ENDPT #21
+app.patch('/confessions/:confession_id/reported_read', (req, res) => {
+  const confessionID = parseInt(req.params.confession_id, 10);
+  confessions.reportedRead(confessionID)
+    .then(() => res.status(204).send('NO CONTENT'))
+    .catch((err) => res.status(400).send(err));
+});
+
+// // ENDPT #22
+// app.patch('/users/:username/:reported_read', (req, res) => {
+//   users.reportedRead(req.params.username)
+//     .then(() => res.status(204).send('NO CONTENT'))
+//     .catch((err) => res.status(400).send(err));
+// });
 
 // ----------------------------------------
 // DELETE ROUTES --------------------------

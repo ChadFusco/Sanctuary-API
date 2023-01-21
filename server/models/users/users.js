@@ -96,4 +96,8 @@ users.ban = async ({ space_name, username }) => (
   Users.findOneAndUpdate({ username }, { $push: { banned: space_name } })
 );
 
+users.reportedRead = async (username) => (
+  Users.findOneAndUpdate({ username }, { $inc: { reported_read: 1 } })
+);
+
 module.exports = users;

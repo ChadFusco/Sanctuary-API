@@ -18,7 +18,7 @@ spaces.create = (body, callback) => {
   });
 };
 
-spaces.update = (space_name, changes, callback) => {
+spaces.update = (space_name, changes) => {
   const spaceUpdates = {};
   if (changes.description) {
     spaceUpdates.description = changes.description;
@@ -26,7 +26,7 @@ spaces.update = (space_name, changes, callback) => {
   if (changes.guidelines) {
     spaceUpdates.guidelines = changes.guidelines;
   }
-  Spaces.findOneAndUpdate({ space_name }, spaceUpdates, callback);
+  return Spaces.findOneAndUpdate({ space_name }, spaceUpdates);
 };
 
 spaces.read = async (space_name, page = 1, count = 4, exact = false) => {

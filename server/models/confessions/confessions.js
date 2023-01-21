@@ -4,6 +4,35 @@ const users = require('../users/users');
 
 const confessions = {};
 
+// HELPER FUNCTIONS
+
+confessions.getConfSpaceCreator = (confessionID) => (
+  Confessions
+    .aggregate([
+      { $match: { confession_id: confessionID } },
+      {
+        $lookup: {
+          from: 'spaces', localField: 'space_name', foreignField: 'space_name', as: 'space',
+        },
+      },
+      {
+        $project: {
+          space: { $arrayElemAt: ['$space', 0] },
+        },
+      },
+      {
+        $addFields: {
+          space_creator: '$space.created_by',
+        },
+      },
+      {
+        $project: {
+          space_creator: 1,
+        },
+      },
+    ])
+);
+
 confessions.readConfession = async (confessionID) => (
   Confessions.findOne({ confession_id: confessionID })
 );
@@ -38,6 +67,7 @@ confessions.findConfession = async (spaceName, username, spaceCreator, page = 1,
           createdAt: 1,
           updatedAt: 1,
           confession_id: 1,
+          reported_read: 1,
         },
       },
       { $match: { 'space.created_by': spaceCreatorFilter } },
@@ -59,6 +89,7 @@ confessions.findConfession = async (spaceName, username, spaceCreator, page = 1,
           createdAt: 1,
           updatedAt: 1,
           confession_id: 1,
+          reported_read: 1,
         },
       },
       {
@@ -77,24 +108,22 @@ confessions.findConfession = async (spaceName, username, spaceCreator, page = 1,
     .skip(skip).limit(limit);
 };
 
-confessions.create = (body, callback) => {
+confessions.create = (body) => (
   Confessions.create({
     created_by: body.created_by,
     confession: body.confession,
     space_name: body.space_name,
-  }, callback);
-};
+  })
+);
 
-confessions.createComment = async (body, callback) => {
+confessions.createComment = async (body) => {
   const foundConfession = await confessions.readConfession(body.confession_id);
   const newComment = {
     created_by: body.created_by,
     comment: body.comment,
   };
   foundConfession.comments.push(newComment);
-  await foundConfession.save()
-    .then(() => callback())
-    .catch((err) => callback(err));
+  return foundConfession.save();
 };
 
 confessions.popPlop = async (confessionID, commentID, popperUsername, popPlop) => (
@@ -175,9 +204,31 @@ confessions.reportComment = async (confessionID, commentID, reportingUsername, c
     .catch((err) => callback(err));
 };
 
-confessions.addHug = ({ confession_id }, callback) => {
-  Confessions.findOneAndUpdate({ confession_id }, { $inc: { hugs: 1 } }, callback);
+confessions.commentReportedRead = async (confessionID, commentID) => {
+  let readConfession;
+  return confessions.readConfession(confessionID)
+    .then((confession) => {
+      readConfession = confession;
+      const commentIdx = confession.comments.reduce((acc, val, i) => (
+        val.comment_id === parseInt(commentID, 10) ? i : acc
+      ), 0);
+      readConfession.comments[commentIdx].reported_read = true;
+      return readConfession;
+    })
+    .then(() => (confessions.getConfSpaceCreator(confessionID)))
+    .then((confs) => (users.reportedRead(confs[0].space_creator)))
+    .then(() => readConfession.save());
 };
+
+confessions.addHug = ({ confession_id }) => (
+  Confessions.findOneAndUpdate({ confession_id }, { $inc: { hugs: 1 } })
+);
+
+confessions.reportedRead = (confessionID) => (
+  Confessions.findOneAndUpdate({ confessionID }, { reported_read: true })
+    .then(() => (confessions.getConfSpaceCreator(confessionID)))
+    .then((confs) => (users.reportedRead(confs[0].space_creator)))
+);
 
 confessions.deleteConfession = ({ confession_id }, callback) => {
   Confessions.deleteOne({ confession_id }, callback);

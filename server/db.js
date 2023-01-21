@@ -24,6 +24,7 @@ const usersSchema = new mongoose.Schema({
       qty: Number,
     },
   ],
+  reported_read: { type: Number, default: 0 },
 });
 
 exports.Users = mongoose.model('Users', usersSchema);
@@ -57,9 +58,7 @@ const commentsSchema = new mongoose.Schema(
     reported: [String],
     pops_list: { type: Object, default: { } },
     plops_list: { type: Object, default: { } },
-    // plops: {
-    //   username: { type: Boolean, default: false },
-    // },
+    reported_read: { type: Boolean, default: false },
   },
   { timestamps: true },
 );
@@ -72,6 +71,7 @@ const confessionsSchema = new mongoose.Schema(
     reported: [String],
     space_name: { type: String, required: true, index: true },
     hugs: { type: Number, default: 0, min: 0 },
+    reported_read: { type: Boolean, default: false },
     comments: [commentsSchema],
   },
   { timestamps: true },
