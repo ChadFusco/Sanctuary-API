@@ -261,14 +261,10 @@ app.patch('/confessions/:confession_id/hug', (req, res) => {
 });
 
 // ENDPT #20
-app.patch('/confessions/:confession_id/hug', (req, res) => {
-  confessions.addHug(req.params, (err) => {
-    if (err) {
-      res.status(400).send(err);
-    } else {
-      res.status(204).send('NO CONTENT');
-    }
-  });
+app.patch('/users/:username/:reported_read', (req, res) => {
+  users.reportedRead(req.params)
+    .then(() => res.status(204).send('NO CONTENT'))
+    .catch((err) => res.status(400).send(err));
 });
 
 // ----------------------------------------
