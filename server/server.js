@@ -61,7 +61,8 @@ app.get('/users/:username', (req, res) => {
 
 // ENDPT #2
 app.get('/spaces', (req, res) => {
-  spaces.read(req.query.space_name, req.query.page, req.query.count, req.query.exact)
+  const exact = !(req.query.exact === 'false' || !req.query.exact);
+  spaces.read(req.query.space_name, req.query.page, req.query.count, exact)
     .then((space) => res.status(space ? 200 : 204).send(space))
     .catch((err) => res.status(400).send(err));
 });
@@ -71,7 +72,8 @@ app.get('/confessions', (req, res) => {
   const {
     reported, space_name, username, space_creator, page, count,
   } = req.query;
-  confessions.findConfession(space_name, username, space_creator, page, count)
+  const exact = !(req.query.exact === 'false' || !req.query.exact);
+  confessions.findConfession(space_name, username, space_creator, page, count, exact)
     .then((foundConfessions) => {
       let filteredConfessions = foundConfessions;
       if (reported !== undefined) {

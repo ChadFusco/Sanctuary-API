@@ -8,15 +8,19 @@ confessions.readConfession = async (confessionID) => (
   Confessions.findOne({ confession_id: confessionID })
 );
 
-confessions.findConfession = async (spaceName, username, spaceCreator, page = 1, count = 4) => {
+// eslint-disable-next-line max-len
+confessions.findConfession = async (spaceName, username, spaceCreator, page = 1, count = 4, exact = false) => {
   const spaceNameRegex = spaceName ? new RegExp(spaceName, 'i') : /./;
+  const spaceNameFilter = (exact && spaceName) ? spaceName : spaceNameRegex;
   const usernameRegex = username ? new RegExp(username, 'i') : /./;
+  const usernameFilter = (exact && username) ? username : usernameRegex;
+  const spaceCreatorRegex = spaceCreator ? new RegExp(spaceCreator, 'i') : /./;
+  const spaceCreatorFilter = (exact && spaceCreator) ? spaceCreator : spaceCreatorRegex;
   const skip = (page - 1) * count;
   const limit = parseInt(count, 10);
-  const spaceCreatorRegex = spaceCreator ? new RegExp(spaceCreator, 'i') : /./;
   return Confessions
     .aggregate([
-      { $match: { space_name: spaceNameRegex, created_by: usernameRegex } },
+      { $match: { space_name: spaceNameFilter, created_by: usernameFilter } },
       {
         $lookup: {
           from: 'spaces', localField: 'space_name', foreignField: 'space_name', as: 'space',
@@ -36,12 +40,7 @@ confessions.findConfession = async (spaceName, username, spaceCreator, page = 1,
           confession_id: 1,
         },
       },
-      { $match: { 'space.created_by': spaceCreatorRegex } },
-      {
-        $addFields: {
-          space_creator: '$space.created_by',
-        },
-      },
+      { $match: { 'space.created_by': spaceCreatorFilter } },
       {
         $lookup: {
           from: 'users', localField: 'created_by', foreignField: 'username', as: 'user',
@@ -50,6 +49,7 @@ confessions.findConfession = async (spaceName, username, spaceCreator, page = 1,
       {
         $project: {
           user: { $arrayElemAt: ['$user', 0] },
+          space: 1,
           created_by: 1,
           confession: 1,
           reported: 1,
@@ -64,6 +64,7 @@ confessions.findConfession = async (spaceName, username, spaceCreator, page = 1,
       {
         $addFields: {
           conf_creator_avatar: '$user.avatar',
+          space_creator: '$space.created_by',
         },
       },
       {
