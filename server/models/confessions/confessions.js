@@ -43,11 +43,6 @@ confessions.findConfession = async (spaceName, username, spaceCreator, page = 1,
         },
       },
       {
-        $project: {
-          space: 0,
-        },
-      },
-      {
         $lookup: {
           from: 'users', localField: 'created_by', foreignField: 'username', as: 'user',
         },
@@ -74,6 +69,7 @@ confessions.findConfession = async (spaceName, username, spaceCreator, page = 1,
       {
         $project: {
           user: 0,
+          space: 0,
         },
       },
     ])
