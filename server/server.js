@@ -159,25 +159,17 @@ app.post('/comments', (req, res) => {
 
 // ENDPT #7
 app.patch('/confessions/:confession_id/report/:username', (req, res) => {
-  confessions.reportConfession(req.params.confession_id, req.params.username, (err) => {
-    if (err) {
-      res.status(400).send(err);
-    } else {
-      res.status(204).send('NO CONTENT');
-    }
-  });
+  confessions.reportConfession(req.params.confession_id, req.params.username)
+    .then(() => res.status(204).send('NO CONTENT'))
+    .catch((err) => res.status(400).send(err));
 });
 
 // ENDPT #8
 app.patch('/confessions/:confession_id/:comment_id/report/:username', (req, res) => {
   const { confession_id, comment_id, username } = req.params;
-  confessions.reportComment(confession_id, comment_id, username, (err) => {
-    if (err) {
-      res.status(400).send(err);
-    } else {
-      res.status(204).send('NO CONTENT');
-    }
-  });
+  confessions.reportComment(confession_id, comment_id, username)
+    .then(() => res.status(204).send('NO CONTENT'))
+    .catch((err) => res.status(400).send(err));
 });
 
 // ENDPT #9
@@ -271,25 +263,17 @@ app.patch('/confessions/:confession_id/reported_read', (req, res) => {
 
 // ENDPT #14
 app.delete('/confessions/:confession_id', (req, res) => {
-  confessions.deleteConfession(req.params, (err) => {
-    if (err) {
-      res.status(400).send(err);
-    } else {
-      res.status(204).send('NO CONTENT');
-    }
-  });
+  confessions.deleteConfession(req.params)
+    .then(() => res.status(204).send('NO CONTENT'))
+    .catch((err) => res.status(400).send(err));
 });
 
 // ENDPT #15
 app.delete('/confessions/:confession_id/:comment_id', (req, res) => {
-  confessions.deleteComment(req.params, (err) => {
-    if (err) {
-      res.status(400).send(err);
-    } else {
-      res.status(204).send('NO CONTENT');
-    }
-  });
+  confessions.deleteComment(req.params)
+    .then(() => res.status(204).send('NO CONTENT'))
+    .catch((err) => res.status(400).send(err));
 });
 
-// next line allows for Jest coverage report
+// next line allows for the Jest coverage report
 module.exports = app;
