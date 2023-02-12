@@ -124,19 +124,16 @@ app.post('/users', (req, res) => {
 
 // ENDPT #6
 app.post('/spaces', (req, res) => {
-  spaces.create(req.body, (err) => {
-    if (err) {
-      res.status(400).send(err);
-    } else {
-      users.updateSpacesCreated(req.body.space_name, req.body.created_by, (error) => {
-        if (error) {
-          res.status(400).send(error);
-        } else {
-          res.status(201).send('CREATED');
-        }
-      });
-    }
-  });
+  const {
+    space_name,
+    created_by,
+    description,
+    guidelines,
+  } = req.body;
+  spaces.create(space_name, created_by, description, guidelines)
+    .then(users.updateSpacesCreated(space_name, created_by))
+    .then(res.status(201).send('CREATED'))
+    .catch((err) => res.status(400).send(err));
 });
 
 // ENDPT #4

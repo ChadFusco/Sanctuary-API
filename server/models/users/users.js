@@ -15,14 +15,12 @@ users.readOne = (username) => (
   Users.findOne({ username })
 );
 
-users.updateSpacesCreated = async (spaceName, username, callback) => {
-  const foundUser = await Users.findOne({ username });
-  foundUser.spaces_created.push(spaceName);
-  foundUser.spaces_joined.push(spaceName);
-  await foundUser.save()
-    .then(() => callback())
-    .catch((err) => callback(err));
-};
+users.updateSpacesCreated = async (spaceName, username) => (
+  Users.findOneAndUpdate(
+    { username },
+    { $push: { spaces_created: spaceName, spaces_joined: spaceName } },
+  )
+);
 
 users.addSpacesJoined = async (spaceName, username, callback) => {
   const foundUser = await Users.findOne({ username });

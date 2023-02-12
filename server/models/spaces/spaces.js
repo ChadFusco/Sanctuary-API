@@ -3,20 +3,15 @@ const { Spaces } = require('../../db');
 
 const spaces = {};
 
-spaces.create = (body, callback) => {
+spaces.create = (space_name, created_by, description, guidelines) => (
   Spaces.create({
-    space_name: body.space_name,
-    created_by: body.created_by,
-    description: body.description,
-    guidelines: body.guidelines,
-  }, (err) => {
-    if (err) {
-      callback(err);
-    } else {
-      spaces.addMember(body.space_name, body.created_by, callback);
-    }
-  });
-};
+    space_name,
+    created_by,
+    description,
+    guidelines,
+  })
+    .then(spaces.addMember(space_name, created_by))
+);
 
 spaces.update = (space_name, changes) => {
   const spaceUpdates = {};
