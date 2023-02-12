@@ -32,7 +32,7 @@ spaces.read = async (space_name, page = 1, count = 4, exact = false) => {
   return Spaces.find({ space_name: spaceNameFilter }, null, { skip, limit });
 };
 
-spaces.addMember = async (spaceName, username, callback) => {
+spaces.addMember = async (spaceName, username) => (
   Spaces.findOne({ space_name: spaceName })
     .then((foundSpace) => {
       if (!foundSpace.members.some((item) => item === username)) {
@@ -40,9 +40,7 @@ spaces.addMember = async (spaceName, username, callback) => {
       }
       return foundSpace.save();
     })
-    .then(() => callback())
-    .catch((err) => callback(err));
-};
+);
 
 spaces.removeMember = async (spaceName, username) => {
   const foundSpace = await Spaces.findOne({ space_name: spaceName });

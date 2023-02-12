@@ -185,13 +185,9 @@ app.patch('/confessions/:confession_id/:comment_id/plop/:username', (req, res) =
 
 // ENDPT #11
 app.patch('/spaces/:space_name/:username/add', (req, res) => {
-  users.addSpacesJoined(req.params.space_name, req.params.username, (err) => {
-    if (err) {
-      res.status(400).send(err);
-    } else {
-      res.status(204).send('NO CONTENT');
-    }
-  });
+  users.addSpacesJoined(req.params.space_name, req.params.username)
+    .then(() => res.status(204).send('NO CONTENT'))
+    .catch((err) => res.status(400).send(err));
 });
 
 // ENDPT #12

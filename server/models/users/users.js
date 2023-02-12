@@ -22,24 +22,20 @@ users.updateSpacesCreated = async (spaceName, username) => (
   )
 );
 
-users.addSpacesJoined = async (spaceName, username, callback) => {
-  const foundUser = await Users.findOne({ username });
-  if (foundUser.banned.some((item) => item === username)) {
-    callback(new Error('User is banned from this space!'));
-  } else if (!foundUser.spaces_joined.some((item) => item === spaceName)) {
-    foundUser.spaces_joined.push(spaceName);
-    spaces.addMember(spaceName, username, (err) => {
-      if (err) {
-        callback(err);
-      } else {
-        foundUser.save();
-        callback();
+users.addSpacesJoined = async (spaceName, username) => (
+  Users.findOne({ username })
+    .then((foundUser) => {
+      if (foundUser.banned.some((item) => item === username)) {
+        return new Error('User is banned from this space!');
       }
-    });
-  } else {
-    callback(new Error('user is already a member'));
-  }
-};
+      if (!foundUser.spaces_joined.some((item) => item === spaceName)) {
+        return new Error('User is already a member');
+      }
+      foundUser.spaces_joined.push(spaceName);
+      return foundUser.save();
+    })
+    .then(() => spaces.addMember(spaceName, username))
+);
 
 users.removeSpacesJoined = async ({ space_name, username }) => {
   const foundUser = await Users.findOne({ username });
