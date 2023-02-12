@@ -28,7 +28,7 @@ users.addSpacesJoined = async (spaceName, username) => (
       if (foundUser.banned.some((item) => item === username)) {
         return new Error('User is banned from this space!');
       }
-      if (!foundUser.spaces_joined.some((item) => item === spaceName)) {
+      if (foundUser.spaces_joined.some((item) => item === spaceName)) {
         return new Error('User is already a member');
       }
       foundUser.spaces_joined.push(spaceName);
