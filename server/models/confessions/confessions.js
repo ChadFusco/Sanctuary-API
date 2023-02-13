@@ -111,11 +111,11 @@ confessions.create = (created_by, confession, space_name) => (
 );
 
 confessions.createComment = (confession_id, created_by, comment) => (
-  Confessions.findOneAndUpdate(
-    { confession_id },
-    { $push: { comments: { created_by, comment } } },
-    { new: true },
-  )
+  confessions.readConfession(confession_id)
+    .then((confession) => {
+      confession.comments.push({ created_by, comment });
+      return confession.save();
+    })
 );
 
 confessions.popPlop = (confessionID, commentID, popperUsername, popPlop) => (
