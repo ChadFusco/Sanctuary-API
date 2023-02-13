@@ -152,26 +152,23 @@ confessions.reportConfession = (confessionID, reportingUsername) => (
     ]))
 );
 
-confessions.reportComment = (confessionID, commentID, reportingUsername) => {
-  let reportedConfession;
-  return confessions.readConfession(confessionID)
+confessions.reportComment = (confessionID, commentID, reportingUsername) => (
+  confessions.readConfession(confessionID)
     .then((confession) => {
-      reportedConfession = confession;
       const commentIdx = confession.comments.reduce((acc, val, i) => (
         val.comment_id === parseInt(commentID, 10) ? i : acc
       ), 0);
       if (!confession.comments[commentIdx].reported.some((item) => item === reportingUsername)) {
         confession.comments[commentIdx].reported.push(reportingUsername);
-        return confession.comments[commentIdx].created_by;
+        return confession.save();
       }
       return new Error('comment has already been reported by this user');
     })
-    .then((reportedUsername) => (
-      users.updateReported(reportedUsername, reportedConfession.space_name)
-    ))
-    .then(() => users.updateReports(reportingUsername, reportedConfession.space_name))
-    .then(() => reportedConfession.save());
-};
+    .then((confession) => Promise.all([
+      users.updateReported(confession.created_by, confession.space_name),
+      users.updateReports(reportingUsername, confession.space_name),
+    ]))
+);
 
 confessions.commentReportedRead = (confessionID, commentID) => {
   let readConfession;
