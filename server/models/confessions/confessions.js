@@ -112,7 +112,7 @@ confessions.create = (created_by, confession, space_name) => (
 
 confessions.createComment = (confession_id, created_by, comment) => (
   Confessions.findOneAndUpdate(
-    { _id: confession_id },
+    { confession_id },
     { $push: { comments: { created_by, comment } } },
     { new: true },
   )
