@@ -14,7 +14,6 @@ users.updateSpacesCreated = (spaceName, username) => (
     { $addToSet: { spaces_created: spaceName, spaces_joined: spaceName } },
     { new: true },
   )
-    .then((user) => user)
 );
 
 users.addSpacesJoined = (spaceName, username) => (

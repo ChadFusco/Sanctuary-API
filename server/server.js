@@ -127,8 +127,8 @@ app.post('/spaces', (req, res) => {
     guidelines,
   } = req.body;
   spaces.create(space_name, created_by, description, guidelines)
-    .then(users.updateSpacesCreated(space_name, created_by))
-    .then(res.status(201).send('CREATED'))
+    .then(() => users.updateSpacesCreated(space_name, created_by))
+    .then(() => res.status(201).send('CREATED'))
     .catch((err) => res.status(400).send(err));
 });
 
