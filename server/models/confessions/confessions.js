@@ -117,6 +117,14 @@ confessions.createComment = async (confession_id, created_by, comment) => {
   return foundConfession.save();
 };
 
+confessions.createComment = (confession_id, created_by, comment) => (
+  Confessions.findOneAndUpdate(
+    { _id: confession_id },
+    { $push: { comments: { created_by, comment } } },
+    { new: true },
+  )
+);
+
 confessions.popPlop = (confessionID, commentID, popperUsername, popPlop) => (
   confessions.readConfession(confessionID)
     .then((confession) => {
