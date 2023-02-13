@@ -30,16 +30,16 @@ users.addSpacesJoined = (spaceName, username) => (
     .then(() => spaces.addMember(spaceName, username))
 );
 
-users.removeSpacesJoined = ({ space_name, username }) => {
+users.removeSpacesJoined = ({ space_name, username }) => (
   spaces.removeMember(space_name, username)
     .then(() => Users.findOneAndUpdate(
       { username },
       { $pull: { spaces_joined: space_name } },
       { new: true },
-    ));
-};
+    ))
+);
 
-users.updateReported = (username, spaceName) => {
+users.updateReported = (username, spaceName) => (
   users.readOne(username)
     .then((user) => {
       const reportedUser = user;
@@ -57,10 +57,10 @@ users.updateReported = (username, spaceName) => {
         });
       }
       return reportedUser.save();
-    });
-};
+    })
+);
 
-users.updateReports = (username, spaceName) => {
+users.updateReports = (username, spaceName) => (
   users.readOne(username)
     .then((user) => {
       const reportingUser = user;
@@ -78,8 +78,8 @@ users.updateReports = (username, spaceName) => {
         });
       }
       return reportingUser.save();
-    });
-};
+    })
+);
 
 users.ban = ({ space_name, username }) => (
   Users.findOneAndUpdate({ username }, { $push: { banned: space_name } })
