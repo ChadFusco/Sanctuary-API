@@ -42,10 +42,8 @@ spaces.addMember = async (spaceName, username) => (
     })
 );
 
-spaces.removeMember = async (spaceName, username) => {
-  const foundSpace = await Spaces.findOne({ space_name: spaceName });
-  foundSpace.members = foundSpace.members.filter((member) => member !== username);
-  return foundSpace.save();
-};
+spaces.removeMember = (space_name, username) => (
+  Spaces.findOneAndUpdate({ space_name }, { $pull: { members: username } }, { new: true })
+);
 
 module.exports = spaces;
