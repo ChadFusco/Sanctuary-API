@@ -239,13 +239,6 @@ app.patch('/confessions/:confession_id/reported_read', (req, res) => {
     .catch((err) => res.status(400).send(err));
 });
 
-// // ENDPT #22
-// app.patch('/users/:username/:reported_read', (req, res) => {
-//   users.reportedRead(req.params.username)
-//     .then(() => res.status(204).send('NO CONTENT'))
-//     .catch((err) => res.status(400).send(err));
-// });
-
 // ----------------------------------------
 // DELETE ROUTES --------------------------
 // ----------------------------------------
