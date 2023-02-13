@@ -42,6 +42,10 @@ spaces.addMember = async (spaceName, username) => (
     })
 );
 
+spaces.addMember = (space_name, username) => (
+  Spaces.findOneAndUpdate({ space_name }, { $addToSet: { members: username } }, { new: true })
+);
+
 spaces.removeMember = (space_name, username) => (
   Spaces.findOneAndUpdate({ space_name }, { $pull: { members: username } }, { new: true })
 );
