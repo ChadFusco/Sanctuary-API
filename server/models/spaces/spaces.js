@@ -25,22 +25,12 @@ spaces.update = (space_name, changes) => {
   return Spaces.findOneAndUpdate({ space_name }, spaceUpdates);
 };
 
-spaces.read = async (spaceName, page = 1, count = 4, exact = false) => {
+spaces.read = (spaceName, page = 1, count = 4, exact = false) => {
   const spaceNameFilter = generateFilter(spaceName, exact);
   const skip = (page - 1) * count;
   const limit = parseInt(count, 10);
   return Spaces.find({ spaceName: spaceNameFilter }, null, { skip, limit });
 };
-
-spaces.addMember = async (spaceName, username) => (
-  Spaces.findOne({ space_name: spaceName })
-    .then((foundSpace) => {
-      if (!foundSpace.members.some((item) => item === username)) {
-        foundSpace.members.push(username);
-      }
-      return foundSpace.save();
-    })
-);
 
 spaces.addMember = (space_name, username) => (
   Spaces.findOneAndUpdate({ space_name }, { $addToSet: { members: username } }, { new: true })
