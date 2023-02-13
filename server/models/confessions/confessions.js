@@ -137,21 +137,20 @@ confessions.popPlop = (confessionID, commentID, popperUsername, popPlop) => (
     })
 );
 
-confessions.reportConfession = (confessionID, reportingUsername) => {
-  let reportedConfession;
-  return confessions.readConfession(confessionID)
+confessions.reportConfession = (confessionID, reportingUsername) => (
+  confessions.readConfession(confessionID)
     .then((confession) => {
-      reportedConfession = confession;
       if (!confession.reported.some((item) => item === reportingUsername)) {
         confession.reported.push(reportingUsername);
-        return reportedConfession;
+        return confession.save();
       }
       return new Error('confession has already been reported by this user');
     })
-    .then((confession) => users.updateReported(confession.created_by, confession.space_name))
-    .then(() => users.updateReports(reportingUsername, reportedConfession.space_name))
-    .then(() => reportedConfession.save());
-};
+    .then((confession) => Promise.all([
+      users.updateReported(confession.created_by, confession.space_name),
+      users.updateReports(reportingUsername, confession.space_name),
+    ]))
+);
 
 confessions.reportComment = (confessionID, commentID, reportingUsername) => {
   let reportedConfession;
