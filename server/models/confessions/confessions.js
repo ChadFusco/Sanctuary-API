@@ -110,13 +110,6 @@ confessions.create = (created_by, confession, space_name) => (
   Confessions.create({ created_by, confession, space_name })
 );
 
-confessions.createComment = async (confession_id, created_by, comment) => {
-  const foundConfession = await confessions.readConfession(confession_id);
-  const newComment = { created_by, comment };
-  foundConfession.comments.push(newComment);
-  return foundConfession.save();
-};
-
 confessions.createComment = (confession_id, created_by, comment) => (
   Confessions.findOneAndUpdate(
     { _id: confession_id },
