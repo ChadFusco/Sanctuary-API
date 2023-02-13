@@ -34,10 +34,12 @@ confessions.getConfSpaceCreator = (confessionID) => (
     ])
 );
 
+// MODEL FUNCTIONS
+
 confessions.readConfession = (confession_id) => Confessions.findOne({ confession_id });
 
 // eslint-disable-next-line max-len
-confessions.findConfession = async (spaceName, username, spaceCreator, page = 1, count = 4, exact = false) => {
+confessions.findConfession = (spaceName, username, spaceCreator, page = 1, count = 4, exact = false) => {
   const spaceNameFilter = generateFilter(spaceName, exact);
   const usernameFilter = generateFilter(username, exact);
   const spaceCreatorFilter = generateFilter(spaceCreator, exact);
