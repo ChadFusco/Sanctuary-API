@@ -4,20 +4,18 @@ const spaces = require('../spaces/spaces');
 
 const users = {};
 
-users.create = (username, avatar) => (Users.create({ username, avatar }));
+users.create = (username, avatar) => Users.create({ username, avatar });
 
-users.readOne = (username) => (
-  Users.findOne({ username })
-);
+users.readOne = (username) => Users.findOne({ username });
 
-users.updateSpacesCreated = async (spaceName, username) => (
+users.updateSpacesCreated = (spaceName, username) => (
   Users.findOneAndUpdate(
     { username },
     { $push: { spaces_created: spaceName, spaces_joined: spaceName } },
   )
 );
 
-users.addSpacesJoined = async (spaceName, username) => (
+users.addSpacesJoined = (spaceName, username) => (
   Users.findOne({ username })
     .then((foundUser) => {
       if (foundUser.banned.some((item) => item === username)) {
@@ -39,8 +37,8 @@ users.removeSpacesJoined = async ({ space_name, username }) => {
   return foundUser.save();
 };
 
-users.updateReported = async (username, spaceName) => {
-  await users.readOne(username)
+users.updateReported = (username, spaceName) => {
+  users.readOne(username)
     .then((user) => {
       const reportedUser = user;
       let wasIncremented = false;
@@ -60,8 +58,8 @@ users.updateReported = async (username, spaceName) => {
     });
 };
 
-users.updateReports = async (username, spaceName) => {
-  await users.readOne(username)
+users.updateReports = (username, spaceName) => {
+  users.readOne(username)
     .then((user) => {
       const reportingUser = user;
       let wasIncremented = false;
@@ -81,11 +79,11 @@ users.updateReports = async (username, spaceName) => {
     });
 };
 
-users.ban = async ({ space_name, username }) => (
+users.ban = ({ space_name, username }) => (
   Users.findOneAndUpdate({ username }, { $push: { banned: space_name } })
 );
 
-users.reportedRead = async (username) => (
+users.reportedRead = (username) => (
   Users.findOneAndUpdate({ username }, { $inc: { reported_read: 1 } })
 );
 

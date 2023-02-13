@@ -134,14 +134,14 @@ app.post('/spaces', (req, res) => {
 
 // ENDPT #4
 app.post('/confessions', (req, res) => {
-  confessions.create(req.body)
+  confessions.create(req.body.created_by, req.body.confession, req.body.space_name)
     .then(() => res.status(201).send('CREATED'))
     .catch((err) => res.status(400).send(err));
 });
 
 // ENDPT #5
 app.post('/comments', (req, res) => {
-  confessions.createComment(req.body)
+  confessions.createComment(req.body.confession_id, req.body.created_by, req.body.comment)
     .then(() => res.status(201).send('CREATED'))
     .catch((err) => res.status(400).send(err));
 });
