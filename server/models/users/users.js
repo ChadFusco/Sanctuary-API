@@ -8,12 +8,13 @@ users.create = (username, avatar) => Users.create({ username, avatar });
 
 users.readOne = (username) => Users.findOne({ username });
 
-users.updateSpacesCreated = (spaceName, username) => (
-  Users.findOneAndUpdate(
+users.updateSpacesCreated = (spaceName, username) => {
+  console.log('username:', username);
+  return Users.findOneAndUpdate(
     { username },
     { $push: { spaces_created: spaceName, spaces_joined: spaceName } },
-  )
-);
+  );
+};
 
 users.addSpacesJoined = (spaceName, username) => (
   Users.findOne({ username })
@@ -82,7 +83,7 @@ users.updateReports = (username, spaceName) => (
 );
 
 users.ban = ({ space_name, username }) => (
-  Users.findOneAndUpdate({ username }, { $push: { banned: space_name } })
+  Users.findOneAndUpdate({ username }, { $addToSet: { banned: space_name } }, { new: true })
 );
 
 users.reportedRead = (username) => (
