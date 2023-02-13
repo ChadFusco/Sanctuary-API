@@ -9,6 +9,7 @@ const cors = require('cors');
 const compression = require('compression');
 const admin = require('firebase-admin');
 const serviceAccount = require('../private/sanctuary-348d4-firebase-adminsdk-vvs0z-ec4b70cd0f.json');
+const { authenticate } = require('./util');
 const {
   users, spaces, confessions,
 } = require('./models');
@@ -48,7 +49,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(compression());
-app.use();
+app.use(authenticate);
 
 // ----------------------------------------
 // GET ROUTES -----------------------------
