@@ -1,13 +1,13 @@
-/* eslint-disable no-underscore-dangle */
+/* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable camelcase */
 // REQUIRE STATEMENTS
 require('dotenv').config();
-// eslint-disable-next-line import/no-extraneous-dependencies
 const debug = require('debug')('http');
 const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
 const compression = require('compression');
+const admin = require('firebase-admin');
 const {
   users, spaces, confessions,
 } = require('./models');
