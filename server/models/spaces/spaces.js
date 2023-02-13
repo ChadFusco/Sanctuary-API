@@ -35,7 +35,6 @@ spaces.read = async (space_name, page = 1, count = 4, exact = false) => {
 spaces.addMember = async (spaceName, username) => (
   Spaces.findOne({ space_name: spaceName })
     .then((foundSpace) => {
-      console.log('foundSpace:', foundSpace);
       if (!foundSpace.members.some((item) => item === username)) {
         foundSpace.members.push(username);
       }
