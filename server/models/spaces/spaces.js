@@ -1,5 +1,6 @@
 /* eslint-disable camelcase */
 const { Spaces } = require('../../db');
+const { generateFilter } = require('../../util');
 
 const spaces = {};
 
@@ -24,12 +25,11 @@ spaces.update = (space_name, changes) => {
   return Spaces.findOneAndUpdate({ space_name }, spaceUpdates);
 };
 
-spaces.read = async (space_name, page = 1, count = 4, exact = false) => {
-  const spaceNameRegex = space_name ? new RegExp(space_name, 'i') : /./;
-  const spaceNameFilter = (exact && space_name) ? space_name : spaceNameRegex;
+spaces.read = async (spaceName, page = 1, count = 4, exact = false) => {
+  const spaceNameFilter = generateFilter(spaceName, exact);
   const skip = (page - 1) * count;
   const limit = parseInt(count, 10);
-  return Spaces.find({ space_name: spaceNameFilter }, null, { skip, limit });
+  return Spaces.find({ spaceName: spaceNameFilter }, null, { skip, limit });
 };
 
 spaces.addMember = async (spaceName, username) => (

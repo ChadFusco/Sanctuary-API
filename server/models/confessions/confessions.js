@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 const { Confessions } = require('../../db');
 const users = require('../users/users');
+const { generateFilter } = require('../../util');
 
 const confessions = {};
 
@@ -39,13 +40,9 @@ confessions.readConfession = async (confessionID) => (
 
 // eslint-disable-next-line max-len
 confessions.findConfession = async (spaceName, username, spaceCreator, page = 1, count = 4, exact = false) => {
-  const generateFilter = (filter) => {
-    if (!filter) return /./;
-    return exact ? filter : new RegExp(filter, 'i');
-  };
-  const spaceNameFilter = generateFilter(spaceName);
-  const usernameFilter = generateFilter(username);
-  const spaceCreatorFilter = generateFilter(spaceCreator);
+  const spaceNameFilter = generateFilter(spaceName, exact);
+  const usernameFilter = generateFilter(username, exact);
+  const spaceCreatorFilter = generateFilter(spaceCreator, exact);
   const skip = (page - 1) * count;
   const limit = parseInt(count, 10);
   return Confessions
