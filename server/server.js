@@ -113,13 +113,9 @@ app.get('/confessions/:confession_id', (req, res) => {
 
 // ENDPT #16
 app.post('/users', (req, res) => {
-  users.create(req.body, (err) => {
-    if (err) {
-      res.status(400).send(err);
-    } else {
-      res.status(201).send('CREATED');
-    }
-  });
+  users.create(req.body.username, req.body.avatar)
+    .then(() => res.status(201).send('CREATED'))
+    .catch((err) => res.status(400).send(err));
 });
 
 // ENDPT #6

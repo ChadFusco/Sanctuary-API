@@ -4,12 +4,7 @@ const spaces = require('../spaces/spaces');
 
 const users = {};
 
-users.create = (body, callback) => {
-  Users.create({
-    username: body.username,
-    avatar: body.avatar,
-  }, callback);
-};
+users.create = (username, avatar) => (Users.create({ username, avatar }));
 
 users.readOne = (username) => (
   Users.findOne({ username })
