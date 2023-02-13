@@ -30,11 +30,13 @@ users.addSpacesJoined = (spaceName, username) => (
     .then(() => spaces.addMember(spaceName, username))
 );
 
-users.removeSpacesJoined = async ({ space_name, username }) => {
-  const foundUser = await Users.findOne({ username });
-  foundUser.spaces_joined = foundUser.spaces_joined.filter((space) => space !== space_name);
-  await spaces.removeMember(space_name, username);
-  return foundUser.save();
+users.removeSpacesJoined = ({ space_name, username }) => {
+  spaces.removeMember(space_name, username)
+    .then(() => Users.findOneAndUpdate(
+      { username },
+      { $pull: { spaces_joined: space_name } },
+      { new: true },
+    ));
 };
 
 users.updateReported = (username, spaceName) => {
