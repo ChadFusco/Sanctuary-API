@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 const { Confessions } = require('../../db');
 const users = require('../users/users');
+const { generateFilter } = require('../../util');
 
 const confessions = {};
 
@@ -33,18 +34,15 @@ confessions.getConfSpaceCreator = (confessionID) => (
     ])
 );
 
-confessions.readConfession = async (confessionID) => (
-  Confessions.findOne({ confession_id: confessionID })
-);
+// MODEL FUNCTIONS
+
+confessions.readConfession = (confession_id) => Confessions.findOne({ confession_id });
 
 // eslint-disable-next-line max-len
-confessions.findConfession = async (spaceName, username, spaceCreator, page = 1, count = 4, exact = false) => {
-  const spaceNameRegex = spaceName ? new RegExp(spaceName, 'i') : /./;
-  const spaceNameFilter = (exact && spaceName) ? spaceName : spaceNameRegex;
-  const usernameRegex = username ? new RegExp(username, 'i') : /./;
-  const usernameFilter = (exact && username) ? username : usernameRegex;
-  const spaceCreatorRegex = spaceCreator ? new RegExp(spaceCreator, 'i') : /./;
-  const spaceCreatorFilter = (exact && spaceCreator) ? spaceCreator : spaceCreatorRegex;
+confessions.findConfession = (spaceName, username, spaceCreator, page = 1, count = 4, exact = false) => {
+  const spaceNameFilter = generateFilter(spaceName, exact);
+  const usernameFilter = generateFilter(username, exact);
+  const spaceCreatorFilter = generateFilter(spaceCreator, exact);
   const skip = (page - 1) * count;
   const limit = parseInt(count, 10);
   return Confessions
@@ -108,25 +106,19 @@ confessions.findConfession = async (spaceName, username, spaceCreator, page = 1,
     .skip(skip).limit(limit);
 };
 
-confessions.create = (body) => (
-  Confessions.create({
-    created_by: body.created_by,
-    confession: body.confession,
-    space_name: body.space_name,
-  })
+confessions.create = (created_by, confession, space_name) => (
+  Confessions.create({ created_by, confession, space_name })
 );
 
-confessions.createComment = async (body) => {
-  const foundConfession = await confessions.readConfession(body.confession_id);
-  const newComment = {
-    created_by: body.created_by,
-    comment: body.comment,
-  };
-  foundConfession.comments.push(newComment);
-  return foundConfession.save();
-};
+confessions.createComment = (confession_id, created_by, comment) => (
+  confessions.readConfession(confession_id)
+    .then((confession) => {
+      confession.comments.push({ created_by, comment });
+      return confession.save();
+    })
+);
 
-confessions.popPlop = async (confessionID, commentID, popperUsername, popPlop) => (
+confessions.popPlop = (confessionID, commentID, popperUsername, popPlop) => (
   confessions.readConfession(confessionID)
     .then((confession) => {
       const foundConf = confession;
@@ -148,63 +140,40 @@ confessions.popPlop = async (confessionID, commentID, popperUsername, popPlop) =
     })
 );
 
-// confessions.popPlopComment = async (confessionID, commentID, delta, callback) => {
-//   const foundConfession = await confessions.readConfession(confessionID);
-//   const foundCommentIdx = foundConfession.comments.reduce((acc, val, i) => (
-//     val.comment_id === parseInt(commentID, 10) ? i : acc
-//   ), 0);
-//   foundConfession.comments[foundCommentIdx].pops += delta;
-//   foundConfession.save()
-//     .then(() => callback())
-//     .catch((err) => callback(err));
-// };
-
-confessions.reportConfession = async (confessionID, reportingUsername, callback) => {
-  let reportedConfession;
-  await confessions.readConfession(confessionID)
+confessions.reportConfession = (confessionID, reportingUsername) => (
+  confessions.readConfession(confessionID)
     .then((confession) => {
-      reportedConfession = confession;
       if (!confession.reported.some((item) => item === reportingUsername)) {
         confession.reported.push(reportingUsername);
-        return reportedConfession;
+        return confession.save();
       }
       return new Error('confession has already been reported by this user');
     })
-    .then((confession) => users.updateReported(confession.created_by, confession.space_name))
-    .then(() => users.updateReports(reportingUsername, reportedConfession.space_name))
-    .then(() => {
-      reportedConfession.save();
-      return callback();
-    })
-    .catch((err) => callback(err));
-};
+    .then((confession) => Promise.all([
+      users.updateReported(confession.created_by, confession.space_name),
+      users.updateReports(reportingUsername, confession.space_name),
+    ]))
+);
 
-confessions.reportComment = async (confessionID, commentID, reportingUsername, callback) => {
-  let reportedConfession;
-  await confessions.readConfession(confessionID)
+confessions.reportComment = (confessionID, commentID, reportingUsername) => (
+  confessions.readConfession(confessionID)
     .then((confession) => {
-      reportedConfession = confession;
       const commentIdx = confession.comments.reduce((acc, val, i) => (
         val.comment_id === parseInt(commentID, 10) ? i : acc
       ), 0);
       if (!confession.comments[commentIdx].reported.some((item) => item === reportingUsername)) {
         confession.comments[commentIdx].reported.push(reportingUsername);
-        return confession.comments[commentIdx].created_by;
+        return confession.save();
       }
       return new Error('comment has already been reported by this user');
     })
-    .then((reportedUsername) => (
-      users.updateReported(reportedUsername, reportedConfession.space_name)
-    ))
-    .then(() => users.updateReports(reportingUsername, reportedConfession.space_name))
-    .then(() => {
-      reportedConfession.save();
-      return callback();
-    })
-    .catch((err) => callback(err));
-};
+    .then((confession) => Promise.all([
+      users.updateReported(confession.created_by, confession.space_name),
+      users.updateReports(reportingUsername, confession.space_name),
+    ]))
+);
 
-confessions.commentReportedRead = async (confessionID, commentID) => {
+confessions.commentReportedRead = (confessionID, commentID) => {
   let readConfession;
   return confessions.readConfession(confessionID)
     .then((confession) => {
@@ -230,21 +199,19 @@ confessions.reportedRead = (confessionID) => (
     .then((confs) => (users.reportedRead(confs[0].space_creator)))
 );
 
-confessions.deleteConfession = ({ confession_id }, callback) => {
-  Confessions.deleteOne({ confession_id }, callback);
-};
+confessions.deleteConfession = ({ confession_id }) => (
+  Confessions.deleteOne({ confession_id })
+);
 
-confessions.deleteConfBySpaceAndUser = async ({ space_name, username }) => (
+confessions.deleteConfBySpaceAndUser = ({ space_name, username }) => (
   Confessions.deleteMany({ space_name, created_by: username })
 );
 
-confessions.deleteComment = async ({ confession_id, comment_id }, callback) => {
-  Confessions.findOneAndUpdate({ confession_id }, {
-    $pull: { comments: { comment_id } },
-  }, callback);
-};
+confessions.deleteComment = ({ confession_id, comment_id }) => (
+  Confessions.findOneAndUpdate({ confession_id }, { $pull: { comments: { comment_id } } })
+);
 
-confessions.deleteCommentsBySpaceAndUser = async ({ space_name, username }) => (
+confessions.deleteCommentsBySpaceAndUser = ({ space_name, username }) => (
   Confessions.findOneAndUpdate({ space_name }, {
     $pull: { comments: { created_by: username } },
   }, { multi: true })

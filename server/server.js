@@ -113,42 +113,35 @@ app.get('/confessions/:confession_id', (req, res) => {
 
 // ENDPT #16
 app.post('/users', (req, res) => {
-  users.create(req.body, (err) => {
-    if (err) {
-      res.status(400).send(err);
-    } else {
-      res.status(201).send('CREATED');
-    }
-  });
+  users.create(req.body.username, req.body.avatar)
+    .then(() => res.status(201).send('CREATED'))
+    .catch((err) => res.status(400).send(err));
 });
 
 // ENDPT #6
 app.post('/spaces', (req, res) => {
-  spaces.create(req.body, (err) => {
-    if (err) {
-      res.status(400).send(err);
-    } else {
-      users.updateSpacesCreated(req.body.space_name, req.body.created_by, (error) => {
-        if (error) {
-          res.status(400).send(error);
-        } else {
-          res.status(201).send('CREATED');
-        }
-      });
-    }
-  });
+  const {
+    space_name,
+    created_by,
+    description,
+    guidelines,
+  } = req.body;
+  spaces.create(space_name, created_by, description, guidelines)
+    .then(() => users.updateSpacesCreated(space_name, created_by))
+    .then(() => res.status(201).send('CREATED'))
+    .catch((err) => res.status(400).send(err));
 });
 
 // ENDPT #4
 app.post('/confessions', (req, res) => {
-  confessions.create(req.body)
+  confessions.create(req.body.created_by, req.body.confession, req.body.space_name)
     .then(() => res.status(201).send('CREATED'))
     .catch((err) => res.status(400).send(err));
 });
 
 // ENDPT #5
 app.post('/comments', (req, res) => {
-  confessions.createComment(req.body)
+  confessions.createComment(req.body.confession_id, req.body.created_by, req.body.comment)
     .then(() => res.status(201).send('CREATED'))
     .catch((err) => res.status(400).send(err));
 });
@@ -159,25 +152,17 @@ app.post('/comments', (req, res) => {
 
 // ENDPT #7
 app.patch('/confessions/:confession_id/report/:username', (req, res) => {
-  confessions.reportConfession(req.params.confession_id, req.params.username, (err) => {
-    if (err) {
-      res.status(400).send(err);
-    } else {
-      res.status(204).send('NO CONTENT');
-    }
-  });
+  confessions.reportConfession(req.params.confession_id, req.params.username)
+    .then(() => res.status(204).send('NO CONTENT'))
+    .catch((err) => res.status(400).send(err));
 });
 
 // ENDPT #8
 app.patch('/confessions/:confession_id/:comment_id/report/:username', (req, res) => {
   const { confession_id, comment_id, username } = req.params;
-  confessions.reportComment(confession_id, comment_id, username, (err) => {
-    if (err) {
-      res.status(400).send(err);
-    } else {
-      res.status(204).send('NO CONTENT');
-    }
-  });
+  confessions.reportComment(confession_id, comment_id, username)
+    .then(() => res.status(204).send('NO CONTENT'))
+    .catch((err) => res.status(400).send(err));
 });
 
 // ENDPT #9
@@ -196,13 +181,9 @@ app.patch('/confessions/:confession_id/:comment_id/plop/:username', (req, res) =
 
 // ENDPT #11
 app.patch('/spaces/:space_name/:username/add', (req, res) => {
-  users.addSpacesJoined(req.params.space_name, req.params.username, (err) => {
-    if (err) {
-      res.status(400).send(err);
-    } else {
-      res.status(204).send('NO CONTENT');
-    }
-  });
+  users.addSpacesJoined(req.params.space_name, req.params.username)
+    .then(() => res.status(204).send('NO CONTENT'))
+    .catch((err) => res.status(400).send(err));
 });
 
 // ENDPT #12
@@ -258,38 +239,23 @@ app.patch('/confessions/:confession_id/reported_read', (req, res) => {
     .catch((err) => res.status(400).send(err));
 });
 
-// // ENDPT #22
-// app.patch('/users/:username/:reported_read', (req, res) => {
-//   users.reportedRead(req.params.username)
-//     .then(() => res.status(204).send('NO CONTENT'))
-//     .catch((err) => res.status(400).send(err));
-// });
-
 // ----------------------------------------
 // DELETE ROUTES --------------------------
 // ----------------------------------------
 
 // ENDPT #14
 app.delete('/confessions/:confession_id', (req, res) => {
-  confessions.deleteConfession(req.params, (err) => {
-    if (err) {
-      res.status(400).send(err);
-    } else {
-      res.status(204).send('NO CONTENT');
-    }
-  });
+  confessions.deleteConfession(req.params)
+    .then(() => res.status(204).send('NO CONTENT'))
+    .catch((err) => res.status(400).send(err));
 });
 
 // ENDPT #15
 app.delete('/confessions/:confession_id/:comment_id', (req, res) => {
-  confessions.deleteComment(req.params, (err) => {
-    if (err) {
-      res.status(400).send(err);
-    } else {
-      res.status(204).send('NO CONTENT');
-    }
-  });
+  confessions.deleteComment(req.params)
+    .then(() => res.status(204).send('NO CONTENT'))
+    .catch((err) => res.status(400).send(err));
 });
 
-// next line allows for Jest coverage report
+// next line allows for the Jest coverage report
 module.exports = app;
