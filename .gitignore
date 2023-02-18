@@ -356,5 +356,6 @@ MigrationBackup/
 .LSOverride
 Icon
 
-
 .env
+
+private/

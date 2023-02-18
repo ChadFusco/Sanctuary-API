@@ -1,16 +1,22 @@
-/* eslint-disable no-underscore-dangle */
+/* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable camelcase */
 // REQUIRE STATEMENTS
 require('dotenv').config();
-// eslint-disable-next-line import/no-extraneous-dependencies
 const debug = require('debug')('http');
 const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
 const compression = require('compression');
+const admin = require('firebase-admin');
+const serviceAccount = require('../private/sanctuary-348d4-firebase-adminsdk-vvs0z-ec4b70cd0f.json');
+const { authenticate } = require('./util');
 const {
   users, spaces, confessions,
 } = require('./models');
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
 
 // HELPER FUNCTIONS
 
@@ -43,10 +49,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(compression());
-
-app.get('/', (req, res) => {
-  res.status(200).send('Sanctuary API server successfully accessed');
-});
+app.use(authenticate);
 
 // ----------------------------------------
 // GET ROUTES -----------------------------
