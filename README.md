@@ -555,10 +555,10 @@ Mark a reported confession as read by the owner of the space the confession belo
 * **Max Peterson - Product Manager**
 	* https://github.com/maxpeterson96
 	* https://www.linkedin.com/in/max-peterson-10b368b3/
-* **Chad Fusco - Architecture Owner**
+* **Chad Fusco - Software Architect**
   * https://www.linkedin.com/in/chadfusco
   * https://github.com/ChadFusco
-* **Joseph Soto - UI Owner**
+* **Joseph Soto - UI Designer**
 * **Kimberly Cheung**
   * https://www.linkedin.com/in/kimberlywycheung
   * https://github.com/kimberlywycheung
