@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 const { Spaces } = require('../../db');
 const { generateFilter } = require('../../util');
 

@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 const { Confessions } = require('../../db');
 const users = require('../users/users');
 const { generateFilter } = require('../../util');
@@ -135,7 +134,7 @@ confessions.reportConfession = (confessionID, reportingUsername) => (
         confession.reported.push(reportingUsername);
         return confession.save();
       }
-      return new Error('confession has already been reported by this user');
+      throw new Error('confession has already been reported by this user');
     })
     .then((confession) => Promise.all([
       users.updateReported(confession.created_by, confession.space_name),
@@ -153,7 +152,7 @@ confessions.reportComment = (confessionID, commentID, reportingUsername) => (
         confession.comments[commentIdx].reported.push(reportingUsername);
         return confession.save();
       }
-      return new Error('comment has already been reported by this user');
+      throw new Error('comment has already been reported by this user');
     })
     .then((confession) => Promise.all([
       users.updateReported(confession.created_by, confession.space_name),

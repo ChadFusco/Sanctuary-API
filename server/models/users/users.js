@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 const { Users } = require('../../db');
 const spaces = require('../spaces/spaces');
 
@@ -19,11 +18,14 @@ users.updateSpacesCreated = (spaceName, username) => (
 users.addSpacesJoined = (spaceName, username) => (
   Users.findOne({ username })
     .then((foundUser) => {
+      if (!foundUser) {
+        throw new Error('User not found');
+      }
       if (foundUser.banned.some((item) => item === username)) {
-        return new Error('User is banned from this space!');
+        throw new Error('User is banned from this space!');
       }
       if (foundUser.spaces_joined.some((item) => item === spaceName)) {
-        return new Error('User is already a member');
+        throw new Error('User is already a member');
       }
       foundUser.spaces_joined.push(spaceName);
       return foundUser.save();
