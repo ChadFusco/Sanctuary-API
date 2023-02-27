@@ -157,7 +157,7 @@ app.post('/comments', (req, res) => {
 app.patch('/confessions/:confession_id/report/:username', (req, res) => {
   confessions.reportConfession(req.params.confession_id, req.params.username)
     .then(() => res.status(204).send('NO CONTENT'))
-    .catch((err) => res.status(400).send(err));
+    .catch((err) => res.status(400).send(err.message));
 });
 
 // ENDPT #8
@@ -186,7 +186,7 @@ app.patch('/confessions/:confession_id/:comment_id/plop/:username', (req, res) =
 app.patch('/spaces/:space_name/:username/add', (req, res) => {
   users.addSpacesJoined(req.params.space_name, req.params.username)
     .then(() => res.status(204).send('NO CONTENT'))
-    .catch((err) => res.status(400).send(err.message));
+    .catch((err) => res.status(400).send(`${err.name} | ${err.message} | ${err.stack}`));
 });
 
 // ENDPT #12
