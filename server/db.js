@@ -42,14 +42,14 @@ const spacesSchema = new mongoose.Schema(
 
 exports.Spaces = mongoose.model('Spaces', spacesSchema);
 
-const popsSchema = new mongoose.Schema(
-  {
-    username: { type: String, required: true, index: true },
-    pop_plop: { type: Boolean, required: true, index: true },
-  },
-);
+// const popsSchema = new mongoose.Schema(
+//   {
+//     username: { type: String, required: true, index: true },
+//     pop_plop: { type: Boolean, required: true, index: true },
+//   },
+// );
 
-exports.Pops = mongoose.model('Pops', popsSchema);
+// exports.Pops = mongoose.model('Pops', popsSchema);
 
 const commentsSchema = new mongoose.Schema(
   {

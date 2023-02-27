@@ -45,64 +45,52 @@ confessions.findConfession = (spaceName, username, spaceCreator, page = 1, count
   const spaceCreatorFilter = generateFilter(spaceCreator, exact);
   const skip = (page - 1) * count;
   const limit = parseInt(count, 10);
-  return Confessions
-    .aggregate([
-      { $match: { space_name: spaceNameFilter, created_by: usernameFilter } },
-      {
-        $lookup: {
-          from: 'spaces', localField: 'space_name', foreignField: 'space_name', as: 'space',
-        },
+  return Confessions.aggregate([
+    {
+      $match: {
+        space_name: spaceNameFilter,
+        created_by: usernameFilter,
       },
-      {
-        $project: {
-          space: { $arrayElemAt: ['$space', 0] },
-          created_by: 1,
-          confession: 1,
-          reported: 1,
-          space_name: 1,
-          hugs: 1,
-          comments: 1,
-          createdAt: 1,
-          updatedAt: 1,
-          confession_id: 1,
-          reported_read: 1,
-        },
+    },
+    {
+      $lookup: {
+        from: 'spaces',
+        localField: 'space_name',
+        foreignField: 'space_name',
+        as: 'space',
       },
-      { $match: { 'space.created_by': spaceCreatorFilter } },
-      {
-        $lookup: {
-          from: 'users', localField: 'created_by', foreignField: 'username', as: 'user',
-        },
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'created_by',
+        foreignField: 'username',
+        as: 'user',
       },
-      {
-        $project: {
-          user: { $arrayElemAt: ['$user', 0] },
-          space: 1,
-          created_by: 1,
-          confession: 1,
-          reported: 1,
-          space_name: 1,
-          hugs: 1,
-          comments: 1,
-          createdAt: 1,
-          updatedAt: 1,
-          confession_id: 1,
-          reported_read: 1,
-        },
+    },
+    {
+      $project: {
+        _id: 0,
+        created_by: 1,
+        confession: 1,
+        reported: 1,
+        space_name: 1,
+        hugs: 1,
+        comments: 1,
+        createdAt: 1,
+        updatedAt: 1,
+        confession_id: 1,
+        reported_read: 1,
+        conf_creator_avatar: '$user.avatar',
+        space_creator: { $arrayElemAt: ['$space.created_by', 0] },
       },
-      {
-        $addFields: {
-          conf_creator_avatar: '$user.avatar',
-          space_creator: '$space.created_by',
-        },
+    },
+    {
+      $match: {
+        space_creator: spaceCreatorFilter,
       },
-      {
-        $project: {
-          user: 0,
-          space: 0,
-        },
-      },
-    ])
+    },
+  ])
     .skip(skip).limit(limit);
 };
 
