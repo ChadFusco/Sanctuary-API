@@ -165,7 +165,7 @@ app.patch('/confessions/:confession_id/:comment_id/report/:username', (req, res)
   const { confession_id, comment_id, username } = req.params;
   confessions.reportComment(confession_id, comment_id, username)
     .then(() => res.status(204).send('NO CONTENT'))
-    .catch((err) => res.status(400).send(err));
+    .catch((err) => res.status(400).send(`${err.name} | ${err.message} | ${err.stack}`));
 });
 
 // ENDPT #9
