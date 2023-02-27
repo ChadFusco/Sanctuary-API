@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 const { Users } = require('../../db');
 const spaces = require('../spaces/spaces');
 

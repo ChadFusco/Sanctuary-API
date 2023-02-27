@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 const { Confessions } = require('../../db');
 const users = require('../users/users');
 const { generateFilter } = require('../../util');

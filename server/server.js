@@ -1,5 +1,4 @@
 /* eslint-disable import/no-extraneous-dependencies */
-/* eslint-disable camelcase */
 // REQUIRE STATEMENTS
 require('dotenv').config();
 const debug = require('debug')('http');
