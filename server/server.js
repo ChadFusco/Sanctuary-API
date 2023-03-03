@@ -7,7 +7,7 @@ const morgan = require('morgan');
 const cors = require('cors');
 const compression = require('compression');
 const admin = require('firebase-admin');
-const serviceAccount = require('../private/sanctuary-348d4-firebase-adminsdk-vvs0z-ec4b70cd0f.json');
+const serviceAccount = require('../private/sanctuary-348d4-firebase-adminsdk-vvs0z-b38b3c7260.json');
 const { authenticate } = require('./util');
 const {
   users, spaces, confessions,
@@ -255,6 +255,13 @@ app.delete('/confessions/:confession_id', (req, res) => {
 // ENDPT #15
 app.delete('/confessions/:confession_id/:comment_id', (req, res) => {
   confessions.deleteComment(req.params)
+    .then(() => res.status(204).send('NO CONTENT'))
+    .catch((err) => res.status(400).send(err.stack));
+});
+
+// ENDPT #22
+app.delete('/spaces/:space_name', (req, res) => {
+  spaces.delete(req.params.space_name)
     .then(() => res.status(204).send('NO CONTENT'))
     .catch((err) => res.status(400).send(err.stack));
 });

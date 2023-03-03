@@ -31,6 +31,8 @@ spaces.read = (spaceName, page = 1, count = 4, exact = false) => {
   return Spaces.find({ spaceName: spaceNameFilter }, null, { skip, limit });
 };
 
+spaces.delete = (space_name) => Spaces.deleteOne({ space_name });
+
 spaces.addMember = (space_name, username) => (
   Spaces.findOneAndUpdate({ space_name }, { $addToSet: { members: username } }, { new: true })
 );
