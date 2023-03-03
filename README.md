@@ -25,7 +25,8 @@ API for the Sanctuary Mobile App. Front-end code can be found at [this repo](htt
   18. [Add a Hug](#18-add-a-hug)
   19. [Get Confession by ID](#19-get-confession-by-id)
   20. [Mark Comment Read by Space Owner](#20-mark-comment-read-by-space-owner)
-  21. [Mark Confession Read by Space Owner](#21-mark-confession-read-by-space-owner)</details>
+  21. [Mark Confession Read by Space Owner](#21-mark-confession-read-by-space-owner)
+  22. [Delete Space](#22-delete-space)</details>
 - [Team](#team)
 
 ## Description
@@ -545,6 +546,23 @@ Mark a reported confession as read by the owner of the space the confession belo
 | Parameter | Type | Description |
 | --- | --- | --- |
 | confession_id | integer | ID of the confession being marked as read by space owner (required) |
+</font>
+
+**Response**
+
+`Status: 204 NO CONTENT`
+
+### **22. Delete Space**
+
+Delete a space
+
+**`DELETE /spaces/:space_name`**
+
+**Parameters**
+<font size="2">
+| Parameter | Type | Description |
+| --- | --- | --- |
+| space_name | string | Space name of space to delete (required) |
 </font>
 
 **Response**
