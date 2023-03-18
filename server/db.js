@@ -83,6 +83,9 @@ const commentsSchema = new mongoose.Schema(
   { timestamps: true },
 );
 commentsSchema.plugin(AutoIncrement, { inc_field: 'comment_id' });
+
+exports.Comments = mongoose.model('Comments', commentsSchema);
+
 const confessionsSchema = new mongoose.Schema(
   {
     created_by: { type: String, required: true },
