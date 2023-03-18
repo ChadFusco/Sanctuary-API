@@ -51,11 +51,18 @@ exports.Spaces = mongoose.model('Spaces', spacesSchema);
 
 // exports.Pops = mongoose.model('Pops', popsSchema);
 
+const MAX_REPORTED = 100;
 const commentsSchema = new mongoose.Schema(
   {
     created_by: { type: String, required: true },
     comment: { type: String, required: true },
-    reported: [String],
+    reported: {
+      type: [String],
+      validate: {
+        validator: (reported) => (reported.length <= MAX_REPORTED),
+        message: `The reported array can have a maximum of ${MAX_REPORTED} usernames`,
+      },
+    },
     pops_list: { type: Object, default: { } },
     plops_list: { type: Object, default: { } },
     reported_read: { type: Boolean, default: false },
@@ -63,8 +70,6 @@ const commentsSchema = new mongoose.Schema(
   { timestamps: true },
 );
 commentsSchema.plugin(AutoIncrement, { inc_field: 'comment_id' });
-
-const MAX_REPORTED = 100;
 const confessionsSchema = new mongoose.Schema(
   {
     created_by: { type: String, required: true },
