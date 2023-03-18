@@ -10,7 +10,7 @@ const admin = require('firebase-admin');
 const serviceAccount = require('../private/sanctuary-348d4-firebase-adminsdk-vvs0z-b38b3c7260.json');
 const { authenticate } = require('./util');
 const {
-  users, spaces, confessions, comments
+  users, spaces, confessions, comments,
 } = require('./models');
 
 admin.initializeApp({
@@ -169,14 +169,14 @@ app.patch('/confessions/:confession_id/:comment_id/report/:username', (req, res)
 
 // ENDPT #9
 app.patch('/confessions/:confession_id/:comment_id/pop/:username', (req, res) => {
-  confessions.popPlop(req.params.confession_id, req.params.comment_id, req.params.username, true)
+  comments.popPlop(req.params.comment_id, req.params.username, true)
     .then(() => res.status(204).send('NO CONTENT'))
     .catch((err) => res.status(400).send(err.stack));
 });
 
 // ENDPT #10
 app.patch('/confessions/:confession_id/:comment_id/plop/:username', (req, res) => {
-  confessions.popPlop(req.params.confession_id, req.params.comment_id, req.params.username, false)
+  comments.popPlop(req.params.comment_id, req.params.username, false)
     .then(() => res.status(204).send('NO CONTENT'))
     .catch((err) => res.status(400).send(err.stack));
 });

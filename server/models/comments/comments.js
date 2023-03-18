@@ -1,33 +1,24 @@
 const { Comments } = require('../../db');
 const users = require('../users/users');
-const { generateFilter } = require('../../util');
 
 const comments = {};
+const confessions = {};
 
 comments.create = (confession_id, created_by, comment) => (
   Comments.create({ confession_id, created_by, comment })
 );
 
-confessions.popPlop = (confessionID, commentID, popperUsername, popPlop) => (
-  confessions.readConfession(confessionID)
-    .then((confession) => {
-      const foundConf = confession;
-      const foundCommentIdx = foundConf.comments.reduce((acc, val, i) => (
-        val.comment_id === parseInt(commentID, 10) ? i : acc
-      ), 0);
-      if (popPlop) {
-        foundConf.comments[foundCommentIdx].pops_list[popperUsername] = true;
-        delete foundConf.comments[foundCommentIdx].plops_list[popperUsername];
-      } else {
-        foundConf.comments[foundCommentIdx].plops_list[popperUsername] = true;
-        delete foundConf.comments[foundCommentIdx].pops_list[popperUsername];
-      }
-      return foundConf;
-    })
-    .then((confession) => {
-      confession.markModified('comments');
-      return confession.save();
-    })
+comments.popPlop = (commentID, popperUsername, popPlop) => (
+  popPlop ? Comments.updateOne(
+    { comment_id: commentID },
+    { $set: { [`pops_list.${popperUsername}`]: true } },
+    { $unset: { [`plops_list.${popperUsername}`]: '' } },
+  )
+    : Comments.updateOne(
+      { comment_id: commentID },
+      { $set: { [`plops_list.${popperUsername}`]: true } },
+      { $unset: { [`pops_list.${popperUsername}`]: '' } },
+    )
 );
 
 comments.reportComment = (confessionID, commentID, reportingUsername) => (
