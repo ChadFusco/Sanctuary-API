@@ -72,7 +72,6 @@ const confessionsSchema = new mongoose.Schema(
     space_name: { type: String, required: true, index: true },
     hugs: { type: Number, default: 0, min: 0 },
     reported_read: { type: Boolean, default: false },
-    comments: [commentsSchema],
   },
   { timestamps: true },
 );
