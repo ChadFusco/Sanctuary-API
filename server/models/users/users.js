@@ -84,7 +84,7 @@ users.updateReports = (username, spaceName) => (
     })
 );
 
-users.ban = ({ space_name, username }) => (
+users.ban = (space_name, username) => (
   Users.findOneAndUpdate({ username }, { $addToSet: { banned: space_name } }, { new: true })
 );
 

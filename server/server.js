@@ -205,7 +205,7 @@ app.patch('/spaces/:space_name/:username/ban', (req, res) => {
     // incl updating the user's "space_joined" field and the space's "members" field
     .then(() => users.removeSpacesJoined(req.params.space_name, req.params.username))
     // fourth, add the space_name to the user's "banned" array
-    .then(() => users.ban(req.params))
+    .then(() => users.ban(req.params.space_name, req.params.username))
     .then(() => res.status(204).send('NO CONTENT'))
     .catch((err) => res.status(400).send(err.stack));
 });
