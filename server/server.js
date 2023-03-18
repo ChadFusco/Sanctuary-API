@@ -200,7 +200,7 @@ app.patch('/spaces/:space_name/:username/ban', (req, res) => {
   // first, delete all the user's comments in the space
   comments.deleteBySpaceAndUser(req.params.space_name, req.params.username)
     // second, delete all the user's confessions in the space
-    .then(() => confessions.deleteConfBySpaceAndUser(req.params))
+    .then(() => confessions.deleteBySpaceAndUser(req.params.space_name, req.params.username))
     // third, remove the user from the space,
     // incl updating the user's "space_joined" field and the space's "members" field
     .then(() => users.removeSpacesJoined(req.params))

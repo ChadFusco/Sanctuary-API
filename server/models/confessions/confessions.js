@@ -126,7 +126,7 @@ confessions.deleteConfession = ({ confession_id }) => (
   Confessions.deleteOne({ confession_id })
 );
 
-confessions.deleteConfBySpaceAndUser = ({ space_name, username }) => (
+confessions.deleteBySpaceAndUser = (space_name, username) => (
   Confessions.deleteMany({ space_name, created_by: username })
 );
 
