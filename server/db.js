@@ -67,7 +67,7 @@ exports.Spaces = mongoose.model('Spaces', spacesSchema);
 const MAX_REPORTED = 100;
 const commentsSchema = new mongoose.Schema(
   {
-    confession_id: { type: String, required: true },
+    confession_id: { type: Number, required: true },
     created_by: { type: String, required: true },
     comment: { type: String, required: true },
     reported: {

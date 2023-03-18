@@ -6,13 +6,25 @@ const comments = {};
 
 // MODEL FUNCTIONS
 
-comments.createComment = (confession_id, created_by, comment) => (
+// -------------------------
+
+confessions.createComment = (confession_id, created_by, comment) => (
   confessions.readConfession(confession_id)
     .then((confession) => {
       confession.comments.push({ created_by, comment });
       return confession.save();
     })
 );
+
+confessions.createComment = (confession_id, created_by, comment) => (
+  confessions.readConfession(confession_id)
+    .then((confession) => {
+      confession.comments.push({ created_by, comment });
+      return confession.save();
+    })
+);
+
+// -------------------------
 
 comments.popPlop = (confessionID, commentID, popperUsername, popPlop) => (
   confessions.readConfession(confessionID)
