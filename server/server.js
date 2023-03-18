@@ -75,7 +75,7 @@ app.get('/confessions', (req, res) => {
     reported, space_name, username, space_creator, page, count,
   } = req.query;
   const exact = !(req.query.exact === 'false' || !req.query.exact);
-  confessions.findConfession(space_name, username, space_creator, page, count, exact)
+  confessions.find(space_name, username, space_creator, page, count, exact)
     .then((foundConfessions) => {
       let filteredConfessions = foundConfessions;
       if (reported !== undefined) {
