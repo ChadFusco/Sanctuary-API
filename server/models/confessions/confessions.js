@@ -35,7 +35,7 @@ confessions.getConfSpaceCreator = (confessionID) => (
 
 // MODEL FUNCTIONS
 
-confessions.readConfession = (confession_id) => Confessions.findOne({ confession_id });
+confessions.read = (confession_id) => Confessions.findOne({ confession_id });
 
 // eslint-disable-next-line max-len
 confessions.findConfession = (spaceName, username, spaceCreator, page = 1, count = 4, exact = false) => {
@@ -98,7 +98,7 @@ confessions.create = (created_by, confession, space_name) => (
 );
 
 confessions.createComment = (confession_id, created_by, comment) => (
-  confessions.readConfession(confession_id)
+  confessions.read(confession_id)
     .then((confession) => {
       confession.comments.push({ created_by, comment });
       return confession.save();
@@ -106,7 +106,7 @@ confessions.createComment = (confession_id, created_by, comment) => (
 );
 
 confessions.popPlop = (confessionID, commentID, popperUsername, popPlop) => (
-  confessions.readConfession(confessionID)
+  confessions.read(confessionID)
     .then((confession) => {
       const foundConf = confession;
       const foundCommentIdx = foundConf.comments.reduce((acc, val, i) => (
@@ -128,7 +128,7 @@ confessions.popPlop = (confessionID, commentID, popperUsername, popPlop) => (
 );
 
 confessions.reportConfession = (confessionID, reportingUsername) => (
-  confessions.readConfession(confessionID)
+  confessions.read(confessionID)
     .then((confession) => {
       if (!confession.reported.some((item) => item === reportingUsername)) {
         confession.reported.push(reportingUsername);
@@ -143,7 +143,7 @@ confessions.reportConfession = (confessionID, reportingUsername) => (
 );
 
 confessions.reportComment = (confessionID, commentID, reportingUsername) => (
-  confessions.readConfession(confessionID)
+  confessions.read(confessionID)
     .then((confession) => {
       const commentIdx = confession.comments.reduce((acc, val, i) => (
         val.comment_id === parseInt(commentID, 10) ? i : acc
@@ -162,7 +162,7 @@ confessions.reportComment = (confessionID, commentID, reportingUsername) => (
 
 confessions.commentReportedRead = (confessionID, commentID) => {
   let readConfession;
-  return confessions.readConfession(confessionID)
+  return confessions.read(confessionID)
     .then((confession) => {
       readConfession = confession;
       const commentIdx = confession.comments.reduce((acc, val, i) => (

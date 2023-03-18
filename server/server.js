@@ -103,7 +103,7 @@ app.get('/confessions', (req, res) => {
 
 // ENDPT #19
 app.get('/confessions/:confession_id', (req, res) => {
-  confessions.readConfession(req.params.confession_id)
+  confessions.read(req.params.confession_id)
     .then((conf) => changePopsPlopsListToInt(conf.toObject()))
     .then((conf) => res.status(conf ? 200 : 404).send(conf))
     .catch((err) => res.status(400).send(err.stack));
@@ -161,8 +161,8 @@ app.patch('/confessions/:confession_id/report/:username', (req, res) => {
 
 // ENDPT #8
 app.patch('/confessions/:confession_id/:comment_id/report/:username', (req, res) => {
-  const { confession_id, comment_id, username } = req.params;
-  confessions.reportComment(confession_id, comment_id, username)
+  const { comment_id, username } = req.params;
+  comments.report(comment_id, username)
     .then(() => res.status(204).send('NO CONTENT'))
     .catch((err) => res.status(400).send(`${err.name} | ${err.message} | ${err.stack}`));
 });

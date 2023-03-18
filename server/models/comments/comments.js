@@ -1,8 +1,8 @@
 const { Comments } = require('../../db');
 const users = require('../users/users');
+const confessions = require('../confessions/confessions');
 
 const comments = {};
-const confessions = {};
 
 comments.create = (confession_id, created_by, comment) => (
   Comments.create({ confession_id, created_by, comment })
@@ -11,37 +11,38 @@ comments.create = (confession_id, created_by, comment) => (
 comments.popPlop = (commentID, popperUsername, popPlop) => (
   popPlop ? Comments.updateOne(
     { comment_id: commentID },
-    { $set: { [`pops_list.${popperUsername}`]: true } },
-    { $unset: { [`plops_list.${popperUsername}`]: '' } },
+    {
+      $set: { [`pops_list.${popperUsername}`]: true },
+      $unset: { [`plops_list.${popperUsername}`]: '' },
+    },
   )
     : Comments.updateOne(
       { comment_id: commentID },
-      { $set: { [`plops_list.${popperUsername}`]: true } },
-      { $unset: { [`pops_list.${popperUsername}`]: '' } },
+      {
+        $set: { [`plops_list.${popperUsername}`]: true },
+        $unset: { [`pops_list.${popperUsername}`]: '' },
+      },
     )
 );
 
-comments.reportComment = (confessionID, commentID, reportingUsername) => (
-  confessions.readConfession(confessionID)
-    .then((confession) => {
-      const commentIdx = confession.comments.reduce((acc, val, i) => (
-        val.comment_id === parseInt(commentID, 10) ? i : acc
-      ), 0);
-      if (!confession.comments[commentIdx].reported.some((item) => item === reportingUsername)) {
-        confession.comments[commentIdx].reported.push(reportingUsername);
-        return confession.save();
-      }
-      throw new Error('comment has already been reported by this user');
+comments.report = (comment_id, reportingUsername) => (
+  Comments.findOneAndUpdate(
+    { comment_id },
+    { $addToSet: { reported: reportingUsername } },
+    { new: true },
+  )
+    .then(async (comment) => {
+      const { space_name } = await confessions.read(comment.confession_id);
+      Promise.all([
+        users.updateReported(comment.created_by, space_name),
+        users.updateReports(reportingUsername, space_name),
+      ]);
     })
-    .then((confession) => Promise.all([
-      users.updateReported(confession.created_by, confession.space_name),
-      users.updateReports(reportingUsername, confession.space_name),
-    ]))
 );
 
 comments.commentReportedRead = (confessionID, commentID) => {
   let readConfession;
-  return confessions.readConfession(confessionID)
+  return confessions.read(confessionID)
     .then((confession) => {
       readConfession = confession;
       const commentIdx = confession.comments.reduce((acc, val, i) => (
