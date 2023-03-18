@@ -56,6 +56,16 @@ comments.commentReportedRead = (confessionID, commentID) => {
     .then(() => readConfession.save());
 };
 
+comments.reportedRead = (comment_id) => {
+  Comments.findOneAndUpdate(
+    { comment_id },
+    { reported_read: true },
+    { new: true },
+  )
+    .then((comment) => confessions.read(comment.confession_id))
+    .then((comment) => confessions.getConfSpaceCreator(confessionID))
+}
+
 comments.deleteComment = ({ confession_id, comment_id }) => (
   Confessions.findOneAndUpdate({ confession_id }, { $pull: { comments: { comment_id } } })
 );

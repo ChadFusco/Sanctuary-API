@@ -226,9 +226,8 @@ app.patch('/confessions/:confession_id/hug', (req, res) => {
 
 // ENDPT #20
 app.patch('/confessions/:confession_id/:comment_id/reported_read', (req, res) => {
-  const confessionID = parseInt(req.params.confession_id, 10);
-  const commentID = parseInt(req.params.confession_id, 10);
-  confessions.commentReportedRead(confessionID, commentID)
+  const commentID = parseInt(req.params.comment_id, 10);
+  comments.reportedRead(commentID)
     .then(() => res.status(204).send('NO CONTENT'))
     .catch((err) => res.status(400).send(err.stack));
 });
