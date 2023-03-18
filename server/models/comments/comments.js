@@ -40,22 +40,6 @@ comments.report = (comment_id, reportingUsername) => (
     })
 );
 
-comments.commentReportedRead = (confessionID, commentID) => {
-  let readConfession;
-  return confessions.read(confessionID)
-    .then((confession) => {
-      readConfession = confession;
-      const commentIdx = confession.comments.reduce((acc, val, i) => (
-        val.comment_id === parseInt(commentID, 10) ? i : acc
-      ), 0);
-      readConfession.comments[commentIdx].reported_read = true;
-      return readConfession;
-    })
-    .then(() => (confessions.getConfSpaceCreator(confessionID)))
-    .then((confs) => (users.reportedRead(confs[0].space_creator)))
-    .then(() => readConfession.save());
-};
-
 comments.reportedRead = (comment_id) => (
   Comments.findOneAndUpdate({ comment_id }, { reported_read: true })
     .then(({ confession_id }) => confessions.getConfSpaceCreator(confession_id))
