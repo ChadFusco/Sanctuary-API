@@ -253,7 +253,7 @@ app.delete('/confessions/:confession_id', (req, res) => {
 
 // ENDPT #15
 app.delete('/confessions/:confession_id/:comment_id', (req, res) => {
-  confessions.deleteComment(req.params)
+  comments.delete(req.params.comment_id)
     .then(() => res.status(204).send('NO CONTENT'))
     .catch((err) => res.status(400).send(err.stack));
 });

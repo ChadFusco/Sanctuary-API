@@ -46,9 +46,7 @@ comments.reportedRead = (comment_id) => (
     .then((confs) => users.reportedRead(confs[0].space_creator))
 );
 
-comments.deleteComment = ({ confession_id, comment_id }) => (
-  Confessions.findOneAndUpdate({ confession_id }, { $pull: { comments: { comment_id } } })
-);
+comments.delete = (comment_id) => Comments.deleteOne({ comment_id });
 
 comments.deleteCommentsBySpaceAndUser = ({ space_name, username }) => (
   Confessions.findOneAndUpdate({ space_name }, {
