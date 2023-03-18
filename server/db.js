@@ -6,12 +6,25 @@ mongoose.set('strictQuery', true);
 
 mongoose.connect('mongodb://localhost:27017/sanctuary');
 
+const MAX_SPACES = 1000;
 const usersSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   avatar: { type: String, required: true },
   banned: [String],
-  spaces_joined: [String],
-  spaces_created: [String],
+  spaces_joined: {
+    type: [String],
+    validate: {
+      validator: (spaces_joined) => (spaces_joined.length <= MAX_SPACES),
+      message: `User cannot join more than ${MAX_SPACES} spaces`,
+    },
+  },
+  spaces_created: {
+    type: [String],
+    validate: {
+      validator: (spaces_created) => (spaces_created.length <= MAX_SPACES),
+      message: `User cannot create more than ${MAX_SPACES} spaces`,
+    },
+  },
   reported: [
     {
       space_name: String,
