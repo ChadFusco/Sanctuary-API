@@ -38,7 +38,7 @@ confessions.getConfSpaceCreator = (confessionID) => (
 confessions.read = (confession_id) => Confessions.findOne({ confession_id });
 
 // eslint-disable-next-line max-len
-confessions.findConfession = (spaceName, username, spaceCreator, page = 1, count = 4, exact = false) => {
+confessions.find = (spaceName, username, spaceCreator, page = 1, count = 4, exact = false) => {
   const spaceNameFilter = generateFilter(spaceName, exact);
   const usernameFilter = generateFilter(username, exact);
   const spaceCreatorFilter = generateFilter(spaceCreator, exact);
@@ -68,6 +68,14 @@ confessions.findConfession = (spaceName, username, spaceCreator, page = 1, count
       },
     },
     {
+      $lookup: {
+        from: 'comments',
+        localField: 'confession_id',
+        foreignField: 'confession_id',
+        as: 'comments',
+      },
+    },
+    {
       $project: {
         _id: 0,
         created_by: 1,
@@ -75,11 +83,11 @@ confessions.findConfession = (spaceName, username, spaceCreator, page = 1, count
         reported: 1,
         space_name: 1,
         hugs: 1,
-        comments: 1,
         createdAt: 1,
         updatedAt: 1,
         confession_id: 1,
         reported_read: 1,
+        comments: 1,
         conf_creator_avatar: '$user.avatar',
         space_creator: { $arrayElemAt: ['$space.created_by', 0] },
       },
