@@ -35,9 +35,26 @@ confessions.getConfSpaceCreator = (confessionID) => (
 
 // MODEL FUNCTIONS
 
-confessions.read = (confession_id) => Confessions.findOne({ confession_id });
+// confessions.read = (confession_id) => Confessions.findOne({ confession_id });
 
-// eslint-disable-next-line max-len
+confessions.read = (confession_id) => (
+  Confessions.aggregate([
+    {
+      $match: {
+        confession_id: parseInt(confession_id, 10),
+      },
+    },
+    {
+      $lookup: {
+        from: 'comments',
+        localField: 'confession_id',
+        foreignField: 'confession_id',
+        as: 'comments',
+      },
+    },
+  ])
+);
+
 confessions.find = (spaceName, username, spaceCreator, page = 1, count = 4, exact = false) => {
   const spaceNameFilter = generateFilter(spaceName, exact);
   const usernameFilter = generateFilter(username, exact);

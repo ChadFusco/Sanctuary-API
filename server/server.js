@@ -104,7 +104,7 @@ app.get('/confessions', (req, res) => {
 // ENDPT #19
 app.get('/confessions/:confession_id', (req, res) => {
   confessions.read(req.params.confession_id)
-    .then((conf) => changePopsPlopsListToInt(conf.toObject()))
+    .then(([conf]) => changePopsPlopsListToInt(conf))
     .then((conf) => res.status(conf ? 200 : 404).send(conf))
     .catch((err) => res.status(400).send(err.stack));
 });
