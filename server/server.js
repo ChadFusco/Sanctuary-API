@@ -10,7 +10,7 @@ const admin = require('firebase-admin');
 const serviceAccount = require('../private/sanctuary-348d4-firebase-adminsdk-vvs0z-b38b3c7260.json');
 const { authenticate } = require('./util');
 const {
-  users, spaces, confessions,
+  users, spaces, confessions, comments
 } = require('./models');
 
 admin.initializeApp({
@@ -143,7 +143,7 @@ app.post('/confessions', (req, res) => {
 
 // ENDPT #5
 app.post('/comments', (req, res) => {
-  confessions.createComment(req.body.confession_id, req.body.created_by, req.body.comment)
+  comments.create(req.body.confession_id, req.body.created_by, req.body.comment)
     .then(() => res.status(201).send('CREATED'))
     .catch((err) => res.status(400).send(err.stack));
 });

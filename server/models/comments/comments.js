@@ -8,7 +8,7 @@ comments.create = (confession_id, created_by, comment) => (
   Comments.create({ confession_id, created_by, comment })
 );
 
-comments.popPlop = (confessionID, commentID, popperUsername, popPlop) => (
+confessions.popPlop = (confessionID, commentID, popperUsername, popPlop) => (
   confessions.readConfession(confessionID)
     .then((confession) => {
       const foundConf = confession;
