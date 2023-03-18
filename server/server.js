@@ -190,7 +190,7 @@ app.patch('/spaces/:space_name/:username/add', (req, res) => {
 
 // ENDPT #12
 app.patch('/spaces/:space_name/:username/remove', (req, res) => {
-  users.removeSpacesJoined(req.params)
+  users.removeSpacesJoined(req.params.space_name, req.params.username)
     .then(() => res.status(204).send('NO CONTENT'))
     .catch((err) => res.status(400).send(err.stack));
 });
@@ -203,7 +203,7 @@ app.patch('/spaces/:space_name/:username/ban', (req, res) => {
     .then(() => confessions.deleteBySpaceAndUser(req.params.space_name, req.params.username))
     // third, remove the user from the space,
     // incl updating the user's "space_joined" field and the space's "members" field
-    .then(() => users.removeSpacesJoined(req.params))
+    .then(() => users.removeSpacesJoined(req.params.space_name, req.params.username))
     // fourth, add the space_name to the user's "banned" array
     .then(() => users.ban(req.params))
     .then(() => res.status(204).send('NO CONTENT'))

@@ -33,7 +33,7 @@ users.addSpacesJoined = (spaceName, username) => (
     .then(() => spaces.addMember(spaceName, username))
 );
 
-users.removeSpacesJoined = ({ space_name, username }) => (
+users.removeSpacesJoined = (space_name, username) => (
   spaces.removeMember(space_name, username)
     .then(() => Users.findOneAndUpdate(
       { username },
