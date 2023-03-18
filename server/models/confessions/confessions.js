@@ -35,8 +35,6 @@ confessions.getConfSpaceCreator = (confessionID) => (
 
 // MODEL FUNCTIONS
 
-// confessions.read = (confession_id) => Confessions.findOne({ confession_id });
-
 confessions.read = (confession_id) => (
   Confessions.aggregate([
     {
@@ -122,15 +120,11 @@ confessions.create = (created_by, confession, space_name) => (
   Confessions.create({ created_by, confession, space_name })
 );
 
-confessions.reportConfession = (confessionID, reportingUsername) => (
-  confessions.read(confessionID)
-    .then((confession) => {
-      if (!confession.reported.some((item) => item === reportingUsername)) {
-        confession.reported.push(reportingUsername);
-        return confession.save();
-      }
-      throw new Error('confession has already been reported by this user');
-    })
+confessions.report = (confessionID, reportingUsername) => (
+  Confessions.updateOne(
+    { confession_id: confessionID },
+    { $addToSet: { reported: reportingUsername } },
+  )
     .then((confession) => Promise.all([
       users.updateReported(confession.created_by, confession.space_name),
       users.updateReports(reportingUsername, confession.space_name),

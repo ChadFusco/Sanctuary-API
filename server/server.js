@@ -154,7 +154,7 @@ app.post('/comments', (req, res) => {
 
 // ENDPT #7
 app.patch('/confessions/:confession_id/report/:username', (req, res) => {
-  confessions.reportConfession(req.params.confession_id, req.params.username)
+  confessions.report(req.params.confession_id, req.params.username)
     .then(() => res.status(204).send('NO CONTENT'))
     .catch((err) => res.status(400).send(`${err.name} | ${err.message} | ${err.stack}`));
 });
