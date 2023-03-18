@@ -48,10 +48,25 @@ comments.reportedRead = (comment_id) => (
 
 comments.delete = (comment_id) => Comments.deleteOne({ comment_id });
 
-comments.deleteCommentsBySpaceAndUser = ({ space_name, username }) => (
-  Confessions.findOneAndUpdate({ space_name }, {
-    $pull: { comments: { created_by: username } },
-  }, { multi: true })
+comments.deleteBySpaceAndUser = (space_name, username) => (
+  Comments.aggregate([
+    {
+      $lookup: {
+        from: 'confessions',
+        localField: 'confession_id',
+        foreignField: 'confession_id',
+        as: 'confession',
+      },
+    },
+    {
+      $match: { 'confession.space_name': space_name, created_by: username },
+    },
+    {
+      $project: { _id: 0, comment_id: 1 },
+    },
+  ])
+    .then((foundComments) => foundComments.map((comment) => comment.comment_id))
+    .then((commentIDs) => Comments.deleteMany({ comment_id: { $in: commentIDs } }))
 );
 
 module.exports = comments;

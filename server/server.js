@@ -198,7 +198,7 @@ app.patch('/spaces/:space_name/:username/remove', (req, res) => {
 // ENDPT #13
 app.patch('/spaces/:space_name/:username/ban', (req, res) => {
   // first, delete all the user's comments in the space
-  confessions.deleteCommentsBySpaceAndUser(req.params)
+  comments.deleteBySpaceAndUser(req.params.space_name, req.params.username)
     // second, delete all the user's confessions in the space
     .then(() => confessions.deleteConfBySpaceAndUser(req.params))
     // third, remove the user from the space,
