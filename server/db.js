@@ -64,11 +64,18 @@ const commentsSchema = new mongoose.Schema(
 );
 commentsSchema.plugin(AutoIncrement, { inc_field: 'comment_id' });
 
+const MAX_REPORTED = 100;
 const confessionsSchema = new mongoose.Schema(
   {
     created_by: { type: String, required: true },
     confession: { type: String, required: true },
-    reported: [String],
+    reported: {
+      type: [String],
+      validate: {
+        validator: (reported) => (reported.length <= MAX_REPORTED),
+        message: `The reported array can have a maximum of ${MAX_REPORTED} usernames`,
+      },
+    },
     space_name: { type: String, required: true, index: true },
     hugs: { type: Number, default: 0, min: 0 },
     reported_read: { type: Boolean, default: false },
