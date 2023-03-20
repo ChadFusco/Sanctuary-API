@@ -78,6 +78,7 @@ app.get('/confessions', (req, res) => {
   confessions.find(space_name, username, space_creator, page, count, exact)
     .then((foundConfessions) => {
       let filteredConfessions = foundConfessions;
+
       if (reported !== undefined) {
         filteredConfessions = filteredConfessions.map((confession) => {
           const filteredConfession = { ...confession };
@@ -92,6 +93,7 @@ app.get('/confessions', (req, res) => {
           return filter;
         });
       }
+
       // convert plops_list and pops_list to pops
       filteredConfessions = filteredConfessions.map((confession) => (
         changePopsPlopsListToInt(confession)
@@ -154,7 +156,12 @@ app.post('/comments', (req, res) => {
 
 // ENDPT #7
 app.patch('/confessions/:confession_id/report/:username', (req, res) => {
-  confessions.report(req.params.confession_id, req.params.username)
+  const { confession_id, username } = req.params;
+  confessions.report(confession_id, username)
+    .then((confession) => Promise.all([
+      users.updateReported(confession.created_by, confession.space_name),
+      users.updateReports(username, confession.space_name),
+    ]))
     .then(() => res.status(204).send('NO CONTENT'))
     .catch((err) => res.status(400).send(`${err.name} | ${err.message} | ${err.stack}`));
 });

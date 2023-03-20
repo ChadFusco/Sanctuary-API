@@ -53,12 +53,12 @@ confessions.read = (confession_id) => (
   ])
 );
 
-confessions.find = (spaceName, username, spaceCreator, page = 1, count = 4, exact = false) => {
+confessions.find = (spaceName, username, spaceCreator, pg = 1, cnt = 4, exact = false) => {
   const spaceNameFilter = generateFilter(spaceName, exact);
   const usernameFilter = generateFilter(username, exact);
   const spaceCreatorFilter = generateFilter(spaceCreator, exact);
-  const skip = (page - 1) * count;
-  const limit = parseInt(count, 10);
+  const skip = (pg - 1) * cnt;
+  const limit = parseInt(cnt, 10);
   return Confessions.aggregate([
     {
       $match: {
@@ -125,10 +125,6 @@ confessions.report = (confessionID, reportingUsername) => (
     { confession_id: confessionID },
     { $addToSet: { reported: reportingUsername } },
   )
-    .then((confession) => Promise.all([
-      users.updateReported(confession.created_by, confession.space_name),
-      users.updateReports(reportingUsername, confession.space_name),
-    ]))
 );
 
 confessions.addHug = ({ confession_id }) => (
