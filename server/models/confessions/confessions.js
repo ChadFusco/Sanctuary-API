@@ -1,5 +1,4 @@
 const { Confessions } = require('../../db');
-const users = require('../users/users');
 const { generateFilter } = require('../../util');
 
 const confessions = {};
@@ -134,7 +133,6 @@ confessions.addHug = ({ confession_id }) => (
 confessions.reportedRead = (confessionID) => (
   Confessions.findOneAndUpdate({ confessionID }, { reported_read: true })
     .then(() => (confessions.getConfSpaceCreator(confessionID)))
-    .then((confs) => (users.reportedRead(confs[0].space_creator)))
 );
 
 confessions.deleteConfession = ({ confession_id }) => (

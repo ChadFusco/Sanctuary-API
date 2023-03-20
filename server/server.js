@@ -243,6 +243,7 @@ app.patch('/confessions/:confession_id/:comment_id/reported_read', (req, res) =>
 app.patch('/confessions/:confession_id/reported_read', (req, res) => {
   const confessionID = parseInt(req.params.confession_id, 10);
   confessions.reportedRead(confessionID)
+    .then((confs) => (users.reportedRead(confs[0].space_creator)))
     .then(() => res.status(204).send('NO CONTENT'))
     .catch((err) => res.status(400).send(err.stack));
 });
