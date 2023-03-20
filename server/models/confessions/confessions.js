@@ -120,9 +120,10 @@ confessions.create = (created_by, confession, space_name) => (
 );
 
 confessions.report = (confessionID, reportingUsername) => (
-  Confessions.updateOne(
+  Confessions.findOneAndUpdate(
     { confession_id: confessionID },
     { $addToSet: { reported: reportingUsername } },
+    { new: true },
   )
 );
 
