@@ -151,6 +151,7 @@ Get confessions as optionally filtered by space name, username, space creator, a
     ],
     "space_name": "tranquility",
     "hugs": 0,
+    "reported_read": false,
     "comments": [
       {
         "created_by": "lookingforpeace",
@@ -497,6 +498,7 @@ Get a single confession by the confession ID.
   ],
   "space_name": "tranquility",
   "hugs": 0,
+  "reported_read": false,
   "comments": [
     {
       "created_by": "lookingforpeace",
