@@ -204,15 +204,16 @@ app.patch('/spaces/:space_name/:username/remove', (req, res) => {
 
 // ENDPT #13
 app.patch('/spaces/:space_name/:username/ban', (req, res) => {
+  const { space_name, username } = req.params;
   // first, delete all the user's comments in the space
-  comments.deleteBySpaceAndUser(req.params.space_name, req.params.username)
+  comments.deleteBySpaceAndUser(space_name, username)
     // second, delete all the user's confessions in the space
-    .then(() => confessions.deleteBySpaceAndUser(req.params.space_name, req.params.username))
+    .then(() => confessions.deleteBySpaceAndUser(space_name, username))
     // third, remove the user from the space,
     // incl updating the user's "space_joined" field and the space's "members" field
-    .then(() => users.removeSpacesJoined(req.params.space_name, req.params.username))
+    .then(() => users.removeSpacesJoined(space_name, username))
     // fourth, add the space_name to the user's "banned" array
-    .then(() => users.ban(req.params.space_name, req.params.username))
+    .then(() => users.ban(space_name, username))
     .then(() => res.status(204).send('NO CONTENT'))
     .catch((err) => res.status(400).send(err.stack));
 });
