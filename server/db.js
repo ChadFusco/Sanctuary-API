@@ -6,12 +6,25 @@ mongoose.set('strictQuery', true);
 
 mongoose.connect('mongodb://localhost:27017/sanctuary');
 
+const MAX_SPACES = 1000;
 const usersSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   avatar: { type: String, required: true },
   banned: [String],
-  spaces_joined: [String],
-  spaces_created: [String],
+  spaces_joined: {
+    type: [String],
+    validate: {
+      validator: (spaces_joined) => (spaces_joined.length <= MAX_SPACES),
+      message: `User cannot join more than ${MAX_SPACES} spaces`,
+    },
+  },
+  spaces_created: {
+    type: [String],
+    validate: {
+      validator: (spaces_created) => (spaces_created.length <= MAX_SPACES),
+      message: `User cannot create more than ${MAX_SPACES} spaces`,
+    },
+  },
   reported: [
     {
       space_name: String,
@@ -51,11 +64,19 @@ exports.Spaces = mongoose.model('Spaces', spacesSchema);
 
 // exports.Pops = mongoose.model('Pops', popsSchema);
 
+const MAX_REPORTED = 100;
 const commentsSchema = new mongoose.Schema(
   {
+    confession_id: { type: Number, required: true },
     created_by: { type: String, required: true },
     comment: { type: String, required: true },
-    reported: [String],
+    reported: {
+      type: [String],
+      validate: {
+        validator: (reported) => (reported.length <= MAX_REPORTED),
+        message: `The reported array can have a maximum of ${MAX_REPORTED} usernames`,
+      },
+    },
     pops_list: { type: Object, default: { } },
     plops_list: { type: Object, default: { } },
     reported_read: { type: Boolean, default: false },
@@ -64,15 +85,22 @@ const commentsSchema = new mongoose.Schema(
 );
 commentsSchema.plugin(AutoIncrement, { inc_field: 'comment_id' });
 
+exports.Comments = mongoose.model('Comments', commentsSchema);
+
 const confessionsSchema = new mongoose.Schema(
   {
     created_by: { type: String, required: true },
     confession: { type: String, required: true },
-    reported: [String],
+    reported: {
+      type: [String],
+      validate: {
+        validator: (reported) => (reported.length <= MAX_REPORTED),
+        message: `The reported array can have a maximum of ${MAX_REPORTED} usernames`,
+      },
+    },
     space_name: { type: String, required: true, index: true },
     hugs: { type: Number, default: 0, min: 0 },
     reported_read: { type: Boolean, default: false },
-    comments: [commentsSchema],
   },
   { timestamps: true },
 );

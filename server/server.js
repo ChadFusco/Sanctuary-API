@@ -10,7 +10,7 @@ const admin = require('firebase-admin');
 const serviceAccount = require('../private/sanctuary-348d4-firebase-adminsdk-vvs0z-b38b3c7260.json');
 const { authenticate } = require('./util');
 const {
-  users, spaces, confessions,
+  users, spaces, confessions, comments,
 } = require('./models');
 
 admin.initializeApp({
@@ -75,9 +75,10 @@ app.get('/confessions', (req, res) => {
     reported, space_name, username, space_creator, page, count,
   } = req.query;
   const exact = !(req.query.exact === 'false' || !req.query.exact);
-  confessions.findConfession(space_name, username, space_creator, page, count, exact)
+  confessions.find(space_name, username, space_creator, page, count, exact)
     .then((foundConfessions) => {
       let filteredConfessions = foundConfessions;
+
       if (reported !== undefined) {
         filteredConfessions = filteredConfessions.map((confession) => {
           const filteredConfession = { ...confession };
@@ -92,6 +93,7 @@ app.get('/confessions', (req, res) => {
           return filter;
         });
       }
+
       // convert plops_list and pops_list to pops
       filteredConfessions = filteredConfessions.map((confession) => (
         changePopsPlopsListToInt(confession)
@@ -103,8 +105,8 @@ app.get('/confessions', (req, res) => {
 
 // ENDPT #19
 app.get('/confessions/:confession_id', (req, res) => {
-  confessions.readConfession(req.params.confession_id)
-    .then((conf) => changePopsPlopsListToInt(conf.toObject()))
+  confessions.read(req.params.confession_id)
+    .then(([conf]) => changePopsPlopsListToInt(conf))
     .then((conf) => res.status(conf ? 200 : 404).send(conf))
     .catch((err) => res.status(400).send(err.stack));
 });
@@ -143,7 +145,7 @@ app.post('/confessions', (req, res) => {
 
 // ENDPT #5
 app.post('/comments', (req, res) => {
-  confessions.createComment(req.body.confession_id, req.body.created_by, req.body.comment)
+  comments.create(req.body.confession_id, req.body.created_by, req.body.comment)
     .then(() => res.status(201).send('CREATED'))
     .catch((err) => res.status(400).send(err.stack));
 });
@@ -154,29 +156,34 @@ app.post('/comments', (req, res) => {
 
 // ENDPT #7
 app.patch('/confessions/:confession_id/report/:username', (req, res) => {
-  confessions.reportConfession(req.params.confession_id, req.params.username)
+  const { confession_id, username } = req.params;
+  confessions.report(confession_id, username)
+    .then((confession) => Promise.all([
+      users.updateReported(confession.created_by, confession.space_name),
+      users.updateReports(username, confession.space_name),
+    ]))
     .then(() => res.status(204).send('NO CONTENT'))
     .catch((err) => res.status(400).send(`${err.name} | ${err.message} | ${err.stack}`));
 });
 
 // ENDPT #8
 app.patch('/confessions/:confession_id/:comment_id/report/:username', (req, res) => {
-  const { confession_id, comment_id, username } = req.params;
-  confessions.reportComment(confession_id, comment_id, username)
+  const { comment_id, username } = req.params;
+  comments.report(comment_id, username)
     .then(() => res.status(204).send('NO CONTENT'))
     .catch((err) => res.status(400).send(`${err.name} | ${err.message} | ${err.stack}`));
 });
 
 // ENDPT #9
 app.patch('/confessions/:confession_id/:comment_id/pop/:username', (req, res) => {
-  confessions.popPlop(req.params.confession_id, req.params.comment_id, req.params.username, true)
+  comments.popPlop(req.params.comment_id, req.params.username, true)
     .then(() => res.status(204).send('NO CONTENT'))
     .catch((err) => res.status(400).send(err.stack));
 });
 
 // ENDPT #10
 app.patch('/confessions/:confession_id/:comment_id/plop/:username', (req, res) => {
-  confessions.popPlop(req.params.confession_id, req.params.comment_id, req.params.username, false)
+  comments.popPlop(req.params.comment_id, req.params.username, false)
     .then(() => res.status(204).send('NO CONTENT'))
     .catch((err) => res.status(400).send(err.stack));
 });
@@ -190,22 +197,23 @@ app.patch('/spaces/:space_name/:username/add', (req, res) => {
 
 // ENDPT #12
 app.patch('/spaces/:space_name/:username/remove', (req, res) => {
-  users.removeSpacesJoined(req.params)
+  users.removeSpacesJoined(req.params.space_name, req.params.username)
     .then(() => res.status(204).send('NO CONTENT'))
     .catch((err) => res.status(400).send(err.stack));
 });
 
 // ENDPT #13
 app.patch('/spaces/:space_name/:username/ban', (req, res) => {
+  const { space_name, username } = req.params;
   // first, delete all the user's comments in the space
-  confessions.deleteCommentsBySpaceAndUser(req.params)
+  comments.deleteBySpaceAndUser(space_name, username)
     // second, delete all the user's confessions in the space
-    .then(() => confessions.deleteConfBySpaceAndUser(req.params))
+    .then(() => confessions.deleteBySpaceAndUser(space_name, username))
     // third, remove the user from the space,
     // incl updating the user's "space_joined" field and the space's "members" field
-    .then(() => users.removeSpacesJoined(req.params))
+    .then(() => users.removeSpacesJoined(space_name, username))
     // fourth, add the space_name to the user's "banned" array
-    .then(() => users.ban(req.params))
+    .then(() => users.ban(space_name, username))
     .then(() => res.status(204).send('NO CONTENT'))
     .catch((err) => res.status(400).send(err.stack));
 });
@@ -226,9 +234,8 @@ app.patch('/confessions/:confession_id/hug', (req, res) => {
 
 // ENDPT #20
 app.patch('/confessions/:confession_id/:comment_id/reported_read', (req, res) => {
-  const confessionID = parseInt(req.params.confession_id, 10);
-  const commentID = parseInt(req.params.confession_id, 10);
-  confessions.commentReportedRead(confessionID, commentID)
+  const commentID = parseInt(req.params.comment_id, 10);
+  comments.reportedRead(commentID)
     .then(() => res.status(204).send('NO CONTENT'))
     .catch((err) => res.status(400).send(err.stack));
 });
@@ -237,6 +244,7 @@ app.patch('/confessions/:confession_id/:comment_id/reported_read', (req, res) =>
 app.patch('/confessions/:confession_id/reported_read', (req, res) => {
   const confessionID = parseInt(req.params.confession_id, 10);
   confessions.reportedRead(confessionID)
+    .then((confs) => (users.reportedRead(confs[0].space_creator)))
     .then(() => res.status(204).send('NO CONTENT'))
     .catch((err) => res.status(400).send(err.stack));
 });
@@ -254,7 +262,7 @@ app.delete('/confessions/:confession_id', (req, res) => {
 
 // ENDPT #15
 app.delete('/confessions/:confession_id/:comment_id', (req, res) => {
-  confessions.deleteComment(req.params)
+  comments.delete(req.params.comment_id)
     .then(() => res.status(204).send('NO CONTENT'))
     .catch((err) => res.status(400).send(err.stack));
 });

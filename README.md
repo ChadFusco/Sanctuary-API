@@ -204,7 +204,7 @@ Post a confession to a space
 
 `Status: 201 CREATED`
 
-## **5. Post Comment**
+### **5. Post Comment**
 
 Post a comment on a confession
 

@@ -33,7 +33,7 @@ users.addSpacesJoined = (spaceName, username) => (
     .then(() => spaces.addMember(spaceName, username))
 );
 
-users.removeSpacesJoined = ({ space_name, username }) => (
+users.removeSpacesJoined = (space_name, username) => (
   spaces.removeMember(space_name, username)
     .then(() => Users.findOneAndUpdate(
       { username },
@@ -84,7 +84,7 @@ users.updateReports = (username, spaceName) => (
     })
 );
 
-users.ban = ({ space_name, username }) => (
+users.ban = (space_name, username) => (
   Users.findOneAndUpdate({ username }, { $addToSet: { banned: space_name } }, { new: true })
 );
 

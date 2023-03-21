@@ -1,5 +1,4 @@
 const { Confessions } = require('../../db');
-const users = require('../users/users');
 const { generateFilter } = require('../../util');
 
 const confessions = {};
@@ -35,15 +34,30 @@ confessions.getConfSpaceCreator = (confessionID) => (
 
 // MODEL FUNCTIONS
 
-confessions.readConfession = (confession_id) => Confessions.findOne({ confession_id });
+confessions.read = (confession_id) => (
+  Confessions.aggregate([
+    {
+      $match: {
+        confession_id: parseInt(confession_id, 10),
+      },
+    },
+    {
+      $lookup: {
+        from: 'comments',
+        localField: 'confession_id',
+        foreignField: 'confession_id',
+        as: 'comments',
+      },
+    },
+  ])
+);
 
-// eslint-disable-next-line max-len
-confessions.findConfession = (spaceName, username, spaceCreator, page = 1, count = 4, exact = false) => {
+confessions.find = (spaceName, username, spaceCreator, pg = 1, cnt = 4, exact = false) => {
   const spaceNameFilter = generateFilter(spaceName, exact);
   const usernameFilter = generateFilter(username, exact);
   const spaceCreatorFilter = generateFilter(spaceCreator, exact);
-  const skip = (page - 1) * count;
-  const limit = parseInt(count, 10);
+  const skip = (pg - 1) * cnt;
+  const limit = parseInt(cnt, 10);
   return Confessions.aggregate([
     {
       $match: {
@@ -68,6 +82,14 @@ confessions.findConfession = (spaceName, username, spaceCreator, page = 1, count
       },
     },
     {
+      $lookup: {
+        from: 'comments',
+        localField: 'confession_id',
+        foreignField: 'confession_id',
+        as: 'comments',
+      },
+    },
+    {
       $project: {
         _id: 0,
         created_by: 1,
@@ -75,11 +97,11 @@ confessions.findConfession = (spaceName, username, spaceCreator, page = 1, count
         reported: 1,
         space_name: 1,
         hugs: 1,
-        comments: 1,
         createdAt: 1,
         updatedAt: 1,
         confession_id: 1,
         reported_read: 1,
+        comments: 1,
         conf_creator_avatar: '$user.avatar',
         space_creator: { $arrayElemAt: ['$space.created_by', 0] },
       },
@@ -97,84 +119,13 @@ confessions.create = (created_by, confession, space_name) => (
   Confessions.create({ created_by, confession, space_name })
 );
 
-confessions.createComment = (confession_id, created_by, comment) => (
-  confessions.readConfession(confession_id)
-    .then((confession) => {
-      confession.comments.push({ created_by, comment });
-      return confession.save();
-    })
+confessions.report = (confessionID, reportingUsername) => (
+  Confessions.findOneAndUpdate(
+    { confession_id: confessionID },
+    { $addToSet: { reported: reportingUsername } },
+    { new: true },
+  )
 );
-
-confessions.popPlop = (confessionID, commentID, popperUsername, popPlop) => (
-  confessions.readConfession(confessionID)
-    .then((confession) => {
-      const foundConf = confession;
-      const foundCommentIdx = foundConf.comments.reduce((acc, val, i) => (
-        val.comment_id === parseInt(commentID, 10) ? i : acc
-      ), 0);
-      if (popPlop) {
-        foundConf.comments[foundCommentIdx].pops_list[popperUsername] = true;
-        delete foundConf.comments[foundCommentIdx].plops_list[popperUsername];
-      } else {
-        foundConf.comments[foundCommentIdx].plops_list[popperUsername] = true;
-        delete foundConf.comments[foundCommentIdx].pops_list[popperUsername];
-      }
-      return foundConf;
-    })
-    .then((confession) => {
-      confession.markModified('comments');
-      return confession.save();
-    })
-);
-
-confessions.reportConfession = (confessionID, reportingUsername) => (
-  confessions.readConfession(confessionID)
-    .then((confession) => {
-      if (!confession.reported.some((item) => item === reportingUsername)) {
-        confession.reported.push(reportingUsername);
-        return confession.save();
-      }
-      throw new Error('confession has already been reported by this user');
-    })
-    .then((confession) => Promise.all([
-      users.updateReported(confession.created_by, confession.space_name),
-      users.updateReports(reportingUsername, confession.space_name),
-    ]))
-);
-
-confessions.reportComment = (confessionID, commentID, reportingUsername) => (
-  confessions.readConfession(confessionID)
-    .then((confession) => {
-      const commentIdx = confession.comments.reduce((acc, val, i) => (
-        val.comment_id === parseInt(commentID, 10) ? i : acc
-      ), 0);
-      if (!confession.comments[commentIdx].reported.some((item) => item === reportingUsername)) {
-        confession.comments[commentIdx].reported.push(reportingUsername);
-        return confession.save();
-      }
-      throw new Error('comment has already been reported by this user');
-    })
-    .then((confession) => Promise.all([
-      users.updateReported(confession.created_by, confession.space_name),
-      users.updateReports(reportingUsername, confession.space_name),
-    ]))
-);
-
-confessions.commentReportedRead = (confessionID, commentID) => {
-  let readConfession;
-  return confessions.readConfession(confessionID)
-    .then((confession) => {
-      readConfession = confession;
-      const commentIdx = confession.comments.reduce((acc, val, i) => (
-        val.comment_id === parseInt(commentID, 10) ? i : acc
-      ), 0);
-      readConfession.comments[commentIdx].reported_read = true;
-      return readConfession;
-    })
-    .then(() => (confessions.getConfSpaceCreator(confessionID)))
-    .then((confs) => (users.reportedRead(confs[0].space_creator)))
-    .then(() => readConfession.save());
-};
 
 confessions.addHug = ({ confession_id }) => (
   Confessions.findOneAndUpdate({ confession_id }, { $inc: { hugs: 1 } })
@@ -183,25 +134,14 @@ confessions.addHug = ({ confession_id }) => (
 confessions.reportedRead = (confessionID) => (
   Confessions.findOneAndUpdate({ confessionID }, { reported_read: true })
     .then(() => (confessions.getConfSpaceCreator(confessionID)))
-    .then((confs) => (users.reportedRead(confs[0].space_creator)))
 );
 
 confessions.deleteConfession = ({ confession_id }) => (
   Confessions.deleteOne({ confession_id })
 );
 
-confessions.deleteConfBySpaceAndUser = ({ space_name, username }) => (
+confessions.deleteBySpaceAndUser = (space_name, username) => (
   Confessions.deleteMany({ space_name, created_by: username })
-);
-
-confessions.deleteComment = ({ confession_id, comment_id }) => (
-  Confessions.findOneAndUpdate({ confession_id }, { $pull: { comments: { comment_id } } })
-);
-
-confessions.deleteCommentsBySpaceAndUser = ({ space_name, username }) => (
-  Confessions.findOneAndUpdate({ space_name }, {
-    $pull: { comments: { created_by: username } },
-  }, { multi: true })
 );
 
 module.exports = confessions;
