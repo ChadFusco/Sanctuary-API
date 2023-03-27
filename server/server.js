@@ -20,6 +20,7 @@ admin.initializeApp({
 // HELPER FUNCTIONS
 
 const changePopsPlopsListToInt = (conf, currentUser) => {
+  console.log('currentUser:', currentUser);
   const filteredConfession = { ...conf };
   const commentsWithPopsAndVoteStatus = filteredConfession.comments.map((comment) => {
     const newComment = { ...comment };

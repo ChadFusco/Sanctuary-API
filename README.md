@@ -120,7 +120,7 @@ Returns information for all spaces matching the `space_name` parameter. If `spac
 
 ### **3. Get Confessions**
 
-Get confessions as optionally filtered by space name, username, space creator, and reported. If `exact` is true, only exact case sensitive matches of the `space` (if provided), `username` (if provided), and `space_creator` (if provided) params will be returned. If `exact` is false, `space_name`, `username`, and `space_creator` will be a case insensitive search.
+Get confessions as optionally filtered by space name, username, space creator, and reported. If `exact` is true, only exact case sensitive matches of the `space` (if provided), `username` (if provided), and `space_creator` (if provided) params will be returned. If `exact` is false, `space_name`, `username`, and `space_creator` will be a case insensitive search. `userVoteStatus` is an integer indicating the current user's pops/plops status for the comment: 1 indicates popped, -1 indicates plopped, and 0 indicates neither (user has not yet voted).
 
 **`GET /confessions?space_name=<value>&username=<value>&page=<value>&count=<value>&reported=<values>&space_creator=<value>&exact=<value>`**
 
@@ -154,20 +154,23 @@ Get confessions as optionally filtered by space name, username, space creator, a
     "reported_read": false,
     "comments": [
       {
+        "confession_id": 1,
         "created_by": "lookingforpeace",
         "comment": "the very first comment",
         "reported": [],
+        "reported_read": false,
         "pops": 0,
         "createdAt": "2023-01-17T07:56:01.487Z",
         "updatedAt": "2023-01-17T07:56:02.561Z",
-        "comment_id": 1
+        "comment_id": 1,
+        "userVoteStatus": 0
       }
     ],
     "createdAt": "2023-01-17T07:56:00.839Z",
     "updatedAt": "2023-01-17T07:56:03.098Z",
     "confession_id": 1,
-		"space_creator": "lookingforpeace",
-		"conf_creator_avatar": "01",
+    "space_creator": "lookingforpeace",
+    "conf_creator_avatar": "01",
   },
   {
     "created_by": "lookingforcalm",
@@ -179,8 +182,8 @@ Get confessions as optionally filtered by space name, username, space creator, a
     "createdAt": "2023-01-17T16:03:45.166Z",
     "updatedAt": "2023-01-17T16:03:45.166Z",
     "confession_id": 2,
-		"space_creator": "lookingforpeace",
-		"conf_creator_avatar": "02",
+    "space_creator": "lookingforpeace",
+    "conf_creator_avatar": "02",
   }
 ]
 ```
@@ -474,7 +477,7 @@ Add a hug to a particular confession
 
 ### **19. Get Confession By ID**
 
-Get a single confession by the confession ID.
+Get a single confession by the confession ID. `userVoteStatus` is an integer indicating the current user's pops/plops status for the comment: 1 indicates popped, -1 indicates plopped, and 0 indicates neither (user has not yet voted).
 
 **`GET /confessions/:confession_id`**
 
@@ -501,13 +504,16 @@ Get a single confession by the confession ID.
   "reported_read": false,
   "comments": [
     {
+      "confession_id": 1,
       "created_by": "lookingforpeace",
       "comment": "the very first comment",
       "reported": [],
+      "reported_read": false,
       "pops": 0,
       "createdAt": "2023-01-17T07:56:01.487Z",
       "updatedAt": "2023-01-17T07:56:02.561Z",
-      "comment_id": 1
+      "comment_id": 1,
+      "userVoteStatus": 0
     }
   ],
   "createdAt": "2023-01-17T07:56:00.839Z",
