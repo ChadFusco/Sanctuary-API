@@ -19,17 +19,27 @@ admin.initializeApp({
 
 // HELPER FUNCTIONS
 
-const changePopsPlopsListToInt = (conf) => {
+const changePopsPlopsListToInt = (conf, currentUser) => {
+  console.log('currentUser:', currentUser);
   const filteredConfession = { ...conf };
-  const commentsWithPops = filteredConfession.comments.map((comment) => {
+  const commentsWithPopsAndVoteStatus = filteredConfession.comments.map((comment) => {
     const newComment = { ...comment };
     const pops = Object.keys(newComment.pops_list || {}).length
       - Object.keys(newComment.plops_list || {}).length;
     delete newComment.plops_list;
     delete newComment.pops_list;
-    return { ...newComment, pops };
+
+    // determine pops/plops status for current user.
+    let userVoteStatus = 0;
+    if (newComment.pops_list && newComment.pops_list[currentUser]) {
+      userVoteStatus = 1;
+    } else if (newComment.plops_list && newComment.plops_list[currentUser]) {
+      userVoteStatus = -1;
+    }
+
+    return { ...newComment, pops, userVoteStatus };
   });
-  return { ...filteredConfession, comments: commentsWithPops };
+  return { ...filteredConfession, comments: commentsWithPopsAndVoteStatus };
 };
 
 const app = express();
@@ -96,7 +106,7 @@ app.get('/confessions', (req, res) => {
 
       // convert plops_list and pops_list to pops
       filteredConfessions = filteredConfessions.map((confession) => (
-        changePopsPlopsListToInt(confession)
+        changePopsPlopsListToInt(confession, req.user.name)
       ));
       res.status(200).send(filteredConfessions);
     })
@@ -106,7 +116,7 @@ app.get('/confessions', (req, res) => {
 // ENDPT #19
 app.get('/confessions/:confession_id', (req, res) => {
   confessions.read(req.params.confession_id)
-    .then(([conf]) => changePopsPlopsListToInt(conf))
+    .then(([conf]) => changePopsPlopsListToInt(conf, req.user.name))
     .then((conf) => res.status(conf ? 200 : 404).send(conf))
     .catch((err) => res.status(400).send(err.stack));
 });
