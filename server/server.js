@@ -31,9 +31,9 @@ const changePopsPlopsListToInt = (conf, currentUser) => {
 
     // determine pops/plops status for current user.
     let userVoteStatus = 0;
-    if (newComment.pops_list && newComment.pops_list[currentUser]) {
+    if (comment.pops_list && comment.pops_list[currentUser]) {
       userVoteStatus = 1;
-    } else if (newComment.plops_list && newComment.plops_list[currentUser]) {
+    } else if (comment.plops_list && comment.plops_list[currentUser]) {
       userVoteStatus = -1;
     }
 
