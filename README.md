@@ -288,13 +288,12 @@ Report a comment
 
 Increase a comment’s pop count by 1. Will not increment if user has already popped the comment.
 
-**`PATCH /confessions/:confession_id/:comment_id/pop/:username`**
+**`PATCH /comments/:comment_id/pop/:username`**
 
 **Parameters**
 <font size="2">
 | Parameter | Type | Description |
 | --- | --- | --- |
-| confession_id | integer | ID of the confession where the comment is located (required) |
 | comment_id | integer | ID of the comment that is to be popped (required) |
 | username | string | Username of the user attempting to pop the comment (required) |
 </font>
@@ -307,13 +306,12 @@ Increase a comment’s pop count by 1. Will not increment if user has already po
 
 Decrement a comment’s pop count by 1. Will not decrement if user has already plopped the comment.
 
-**`PATCH /confessions/:confession_id/:comment_id/plop/:username`**
+**`PATCH /comments/:comment_id/plop/:username`**
 
 **Parameters**
 <font size="2">
 | Parameter | Type | Description |
 | --- | --- | --- |
-| confession_id | integer | ID of the confession where the comment is located (required) |
 | comment_id | integer | ID of the comment that is to be plopped (required) |
 | username | string | Username of the user attempting to pop the comment (required) |
 </font>
