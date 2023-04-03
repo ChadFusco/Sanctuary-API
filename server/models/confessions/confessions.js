@@ -102,7 +102,7 @@ confessions.find = (spaceName, username, spaceCreator, pg = 1, cnt = 4, exact = 
         confession_id: 1,
         reported_read: 1,
         comments: 1,
-        conf_creator_avatar: '$user.avatar',
+        conf_creator_avatar: { $arrayElemAt: ['$user.avatar', 0] },
         space_creator: { $arrayElemAt: ['$space.created_by', 0] },
       },
     },

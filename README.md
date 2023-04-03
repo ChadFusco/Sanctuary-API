@@ -269,13 +269,12 @@ Report a confession
 
 Report a comment
 
-**`PATCH /confessions/:confession_id/:comment_id/report/:username`**
+**`PATCH /comments/:comment_id/report/:username`**
 
 **Parameters**
 <font size="2">
 | Parameter | Type | Description |
 | --- | --- | --- |
-| confession_id | integer | ID of the confession where the comment is located (required) |
 | comment_id | integer | ID of the comment being reported (required) |
 | username | string | username of the user reporting the confession (required) |
 </font>
@@ -288,13 +287,12 @@ Report a comment
 
 Increase a comment’s pop count by 1. Will not increment if user has already popped the comment.
 
-**`PATCH /confessions/:confession_id/:comment_id/pop/:username`**
+**`PATCH /comments/:comment_id/pop/:username`**
 
 **Parameters**
 <font size="2">
 | Parameter | Type | Description |
 | --- | --- | --- |
-| confession_id | integer | ID of the confession where the comment is located (required) |
 | comment_id | integer | ID of the comment that is to be popped (required) |
 | username | string | Username of the user attempting to pop the comment (required) |
 </font>
@@ -307,13 +305,12 @@ Increase a comment’s pop count by 1. Will not increment if user has already po
 
 Decrement a comment’s pop count by 1. Will not decrement if user has already plopped the comment.
 
-**`PATCH /confessions/:confession_id/:comment_id/plop/:username`**
+**`PATCH /comments/:comment_id/plop/:username`**
 
 **Parameters**
 <font size="2">
 | Parameter | Type | Description |
 | --- | --- | --- |
-| confession_id | integer | ID of the confession where the comment is located (required) |
 | comment_id | integer | ID of the comment that is to be plopped (required) |
 | username | string | Username of the user attempting to pop the comment (required) |
 </font>
@@ -401,13 +398,12 @@ Delete a confession
 
 Delete a comment
 
-**`DELETE /confessions/:confession_id/:comment_id`**
+**`DELETE /comments/:comment_id`**
 
 **Parameters**
 <font size="2">
 | Parameter | Type | Description |
 | --- | --- | --- |
-| confession_id | integer | ID of the confession where the comment to be deleted is located (required) |
 | comment_id | integer | ID of the comment being deleted (required) |
 </font>
 
@@ -528,13 +524,12 @@ Get a single confession by the confession ID. `userVoteStatus` is an integer ind
 Mark a reported comment as read by the owner of the space the comment belongs to.
 ***Side-effect***: The `reported_read` property on the space owner user is incremented by 1.
 
-**`PATCH /confessions/:confession_id/:comment_id/reported_read`**
+**`PATCH /comments/:comment_id/reported_read`**
 
 **Parameters**
 <font size="2">
 | Parameter | Type | Description |
 | --- | --- | --- |
-| confession_id | integer | ID of the confession where the comment is located (required) |
 | comment_id | integer | ID of the comment being marked as read by space owner (required) |
 </font>
 

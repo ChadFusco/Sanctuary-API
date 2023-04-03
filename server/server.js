@@ -20,7 +20,6 @@ admin.initializeApp({
 // HELPER FUNCTIONS
 
 const changePopsPlopsListToInt = (conf, currentUser) => {
-  console.log('currentUser:', currentUser);
   const filteredConfession = { ...conf };
   const commentsWithPopsAndVoteStatus = filteredConfession.comments.map((comment) => {
     const newComment = { ...comment };
@@ -177,7 +176,7 @@ app.patch('/confessions/:confession_id/report/:username', (req, res) => {
 });
 
 // ENDPT #8
-app.patch('/confessions/:confession_id/:comment_id/report/:username', (req, res) => {
+app.patch('/comments/:comment_id/report/:username', (req, res) => {
   const { comment_id, username } = req.params;
   comments.report(comment_id, username)
     .then(() => res.status(204).send('NO CONTENT'))
@@ -185,14 +184,14 @@ app.patch('/confessions/:confession_id/:comment_id/report/:username', (req, res)
 });
 
 // ENDPT #9
-app.patch('/confessions/:confession_id/:comment_id/pop/:username', (req, res) => {
+app.patch('/comments/:comment_id/pop/:username', (req, res) => {
   comments.popPlop(req.params.comment_id, req.params.username, true)
     .then(() => res.status(204).send('NO CONTENT'))
     .catch((err) => res.status(400).send(err.stack));
 });
 
 // ENDPT #10
-app.patch('/confessions/:confession_id/:comment_id/plop/:username', (req, res) => {
+app.patch('/comments/:comment_id/plop/:username', (req, res) => {
   comments.popPlop(req.params.comment_id, req.params.username, false)
     .then(() => res.status(204).send('NO CONTENT'))
     .catch((err) => res.status(400).send(err.stack));
@@ -243,7 +242,7 @@ app.patch('/confessions/:confession_id/hug', (req, res) => {
 });
 
 // ENDPT #20
-app.patch('/confessions/:confession_id/:comment_id/reported_read', (req, res) => {
+app.patch('/comments/:comment_id/reported_read', (req, res) => {
   const commentID = parseInt(req.params.comment_id, 10);
   comments.reportedRead(commentID)
     .then(() => res.status(204).send('NO CONTENT'))
@@ -271,7 +270,7 @@ app.delete('/confessions/:confession_id', (req, res) => {
 });
 
 // ENDPT #15
-app.delete('/confessions/:confession_id/:comment_id', (req, res) => {
+app.delete('/comments/:comment_id', (req, res) => {
   comments.delete(req.params.comment_id)
     .then(() => res.status(204).send('NO CONTENT'))
     .catch((err) => res.status(400).send(err.stack));
