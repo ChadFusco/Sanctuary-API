@@ -184,14 +184,14 @@ app.patch('/confessions/:confession_id/:comment_id/report/:username', (req, res)
 });
 
 // ENDPT #9
-app.patch('/confessions/:confession_id/:comment_id/pop/:username', (req, res) => {
+app.patch('/comments/:comment_id/pop/:username', (req, res) => {
   comments.popPlop(req.params.comment_id, req.params.username, true)
     .then(() => res.status(204).send('NO CONTENT'))
     .catch((err) => res.status(400).send(err.stack));
 });
 
 // ENDPT #10
-app.patch('/confessions/:confession_id/:comment_id/plop/:username', (req, res) => {
+app.patch('/comments/:comment_id/plop/:username', (req, res) => {
   comments.popPlop(req.params.comment_id, req.params.username, false)
     .then(() => res.status(204).send('NO CONTENT'))
     .catch((err) => res.status(400).send(err.stack));
