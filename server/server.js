@@ -176,7 +176,7 @@ app.patch('/confessions/:confession_id/report/:username', (req, res) => {
 });
 
 // ENDPT #8
-app.patch('/confessions/:confession_id/:comment_id/report/:username', (req, res) => {
+app.patch('/comments/:comment_id/report/:username', (req, res) => {
   const { comment_id, username } = req.params;
   comments.report(comment_id, username)
     .then(() => res.status(204).send('NO CONTENT'))
