@@ -242,7 +242,7 @@ app.patch('/confessions/:confession_id/hug', (req, res) => {
 });
 
 // ENDPT #20
-app.patch('/confessions/:confession_id/:comment_id/reported_read', (req, res) => {
+app.patch('/comments/:comment_id/reported_read', (req, res) => {
   const commentID = parseInt(req.params.comment_id, 10);
   comments.reportedRead(commentID)
     .then(() => res.status(204).send('NO CONTENT'))
